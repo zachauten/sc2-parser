@@ -6,8 +6,8 @@ use crate::replay::{Metadata, Replay, Event};
 use crate::decoders::DecoderResult;
 use crate::events::player_stats_event::PlayerStatsEvent;
 use crate::events::object_event::ObjectEvent;
-
 use std::collections::HashMap;
+use wasm_bindgen::prelude::*;
 
 pub type RaceMappings<'a> = HashMap<&'a str, &'a str>;
 

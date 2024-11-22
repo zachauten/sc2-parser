@@ -97,7 +97,7 @@ fn main() {
   let now = Instant::now();
 
   // let replay_dir = Path::new("/Users/lukeholroyd/Desktop/Projects/rust-parser/");
-  let replay_dir = Path::new("/Users/lukeholroyd/Desktop/replays/structured/");
+  let replay_dir = Path::new("/mnt/c/Users/zacha/Documents/StarCraft II/Accounts/50968896/1-S2-1-2508124/Replays/Multiplayer/");
   let mut replays: Vec<Replay> = vec![];
   let mut seen_replays: HashSet<String> = HashSet::new();
   visit_dirs(&mut replays, replay_dir).unwrap();
