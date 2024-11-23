@@ -3,7 +3,6 @@ use crate::game::{Game, GameObject};
 use crate::parser::TimelineContext;
 use crate::replay::Event;
 
-
 const UNITS: [&str; 47] = [
     // Protoss
     "Zealot",
@@ -212,9 +211,9 @@ impl ObjectEvent {
         if event_name == "NNet.Replay.Tracker.SUnitDiedEvent" {
             if let Ok(idx) = game
                 .objects
-                .binary_search_by(|obj| obj.tag_index.cmp(&tag_index)) {
+                .binary_search_by(|obj| obj.tag_index.cmp(&tag_index))
+            {
                 game.objects.remove(idx);
-                
             }
         }
 

@@ -8,7 +8,6 @@ use std::io::SeekFrom;
 // use bzip2_rs::decoder::Decoder;
 use bzip2_rs::DecoderReader;
 
-
 const MPQ_FILE_IMPLODE: u32 = 0x00000100;
 const MPQ_FILE_COMPRESS: u32 = 0x00000200;
 const MPQ_FILE_ENCRYPTED: u32 = 0x00010000;

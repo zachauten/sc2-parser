@@ -3,6 +3,7 @@ use crate::mpq::MPQArchive;
 use crate::protocol::Protocol;
 
 use serde::{Deserialize, Serialize};
+use sha256::digest_bytes;
 
 use std::io::{BufReader, Cursor, Read, Seek};
 
@@ -59,13 +60,8 @@ pub struct Replay {
 #[wasm_bindgen]
 impl Replay {
     #[wasm_bindgen(constructor)]
-    pub fn constructor(
-        bytes: Vec<u8>,
-        path: &str,
-        content_hash: String,
-        tags: Vec<String>,
-    ) -> JsValue {
-        let replay = Self::new(bytes, path, content_hash, tags);
+    pub fn constructor(bytes: Vec<u8>, path: &str, tags: Vec<String>) -> JsValue {
+        let replay = Self::new(bytes, path, tags);
         serde_wasm_bindgen::to_value(&replay).unwrap()
     }
 }
@@ -73,7 +69,8 @@ impl Replay {
 impl Replay {
     // TODO: generate content hash, it shouldn't need to be passed in.
     // TODO: remove tags, that can be handled outside of replay parsing
-    pub fn new(bytes: Vec<u8>, path: &str, content_hash: String, tags: Vec<String>) -> Replay {
+    pub fn new(bytes: Vec<u8>, path: &str, tags: Vec<String>) -> Replay {
+        let content_hash = digest_bytes(&bytes);
         let cursor = Cursor::new(bytes);
         let reader = BufReader::new(cursor);
         let archive = MPQArchive::new(reader);

@@ -431,9 +431,13 @@ impl Builds {
             vec![(0, build.len() as u8, 0, other_build.len() as u8)];
         let mut matching_blocks = vec![];
 
-        while let Some((build_low_index, build_high_index, other_build_low_index, other_build_high_index)) = queue.pop() {
-            
-
+        while let Some((
+            build_low_index,
+            build_high_index,
+            other_build_low_index,
+            other_build_high_index,
+        )) = queue.pop()
+        {
             let longest_match = Builds::find_longest_match(
                 build,
                 other_build,

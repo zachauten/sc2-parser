@@ -6,12 +6,6 @@ use std::io::Result;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
-use sha256::digest_file;
-
-#[derive(Serialize, Deserialize)]
-struct Manifest {
-    content_hashes: Vec<String>,
-}
 
 pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
     const VALID_TAGS: [&str; 10] = [
@@ -48,21 +42,11 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                             }
                         }
 
-                        let content_hash =
-                            digest_file(&path).expect("Replay file should be hashed");
-
-                        // let bucket_path = format!("/Users/lukeholroyd/Desktop/replays/bucket/{content_hash}.SC2Replay");
-                        // println!("copying replay file to new bucket path: {:?}", bucket_path);
-                        // copy(
-                        //   &path,
-                        //   bucket_path,
-                        // ).expect("Replay file is copied from existing file structure into bucket structure");
-
                         let path_str = path.to_str().unwrap();
                         println!("parsing replay {:?}", path_str);
                         let bytes = std::fs::read(path_str).expect("Failed to read replay file");
 
-                        let replay = Replay::new(bytes, path_str, content_hash, tags);
+                        let replay = Replay::new(bytes, path_str, tags);
                         let raw_played_at = &replay
                             .parsed
                             .player_info

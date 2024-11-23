@@ -98,7 +98,6 @@ pub struct TinybirdTimelineEntry {
 fn main() {
     let now = Instant::now();
 
-    // let replay_dir = Path::new("/Users/lukeholroyd/Desktop/Projects/rust-parser/");
     let replay_dir = Path::new("/mnt/c/Users/zacha/Documents/StarCraft II/Accounts/50968896/1-S2-1-2508124/Replays/Multiplayer/");
     let mut replays: Vec<Replay> = vec![];
     let mut seen_replays: HashSet<String> = HashSet::new();
@@ -109,13 +108,11 @@ fn main() {
 
     let replay_summaries: Vec<ReplaySummary> = vec![];
     let mut replay_builds: Vec<String> = vec![];
-    // let mut replay_units: Vec<String> = vec![];
     let mut result = SerializedReplays {
         replays: replay_summaries,
     };
 
     let mut tinybird_serialized: Vec<TinybirdGame> = vec![];
-    // let mut tinybird_timelines: Vec<TinybirdTimelineEntry> = vec![];
 
     let mut replay_parser = ReplayParser::new();
 
@@ -129,11 +126,7 @@ fn main() {
         }
 
         // refactor event and replay parsers into single parser
-        let replay_summary = match replay_parser.parse_replay(
-            replay,
-            &mut replay_builds,
-            // &mut replay_units,
-        ) {
+        let replay_summary = match replay_parser.parse_replay(replay, &mut replay_builds) {
             Ok(summary) => summary,
             Err(e) => {
                 // panic!("Error parsing replay: {e}");
@@ -145,11 +138,11 @@ fn main() {
     }
 
     for replay_summary in result.replays {
-        if !replay_summary.tinybird.winner_build.is_empty() && !replay_summary.tinybird.loser_build.is_empty()
+        if !replay_summary.tinybird.winner_build.is_empty()
+            && !replay_summary.tinybird.loser_build.is_empty()
         {
             tinybird_serialized.push(replay_summary.tinybird.clone());
         }
-        // tinybird_timelines.extend(replay_summary.timeline.clone());
 
         let mut races = vec![];
         let mut matchup = vec![];
@@ -171,53 +164,9 @@ fn main() {
             let win = (p_id + 1) == replay_summary.winner as usize;
             build_tokens.generate_tokens(&player_build, win, token_prefix);
         }
-
-        // let matchup_prefix = matchup.join(",");
-        // for (p_id, player_unit_index) in replay_summary.unit_mappings.iter().enumerate() {
-        //   let player_units: Vec<String> = replay_units[*player_unit_index as usize].split(",").map(|s| s.to_string()).collect();
-        //   let token_prefix = format!("{}-{}", races[p_id], matchup_prefix);
-
-        //   let mut win = false;
-        //   win = (p_id + 1) == replay_summary.winner as usize;
-
-        //   build_tokens.units
-        //     .entry(format!(
-        //       "{token_prefix}__{}",
-        //       player_units.join(",")
-        //     ))
-        //     .and_modify(|units_count| {
-        //       units_count.total += 1;
-        //       if win {
-        //         units_count.wins += 1;
-        //       } else {
-        //         units_count.losses += 1;
-        //       }
-        //     })
-        //     .or_insert_with(|| {
-        //       let mut units = BuildCount {
-        //         total: 1,
-        //         wins: 0,
-        //         losses: 0,
-        //       };
-
-        //       if win {
-        //         units.wins += 1;
-        //       } else {
-        //         units.losses += 1;
-        //       }
-
-        //       units
-        //     });
-
-        //   if player_units.len() <= 3 {
-        //     // println!("Build has less than 3 buildings: {:?}", player_build);
-        //     continue;
-        //   }
-        // }
     }
 
     build_tokens.generate_matchup_build_trees();
-    // build_tokens.generate_matchup_unit_trees();
 
     println!(
         "{:?} replays parsed in {:.2?}, {:?} per replay",
@@ -226,21 +175,11 @@ fn main() {
         now.elapsed() / num_replays as u32
     );
 
-    // let mut mapped_replays = HashMap::new();
-    // for replay in &result.replays {
-    //   mapped_replays.insert(replay.content_hash, replay);
-    // }
-    // let replay_output = File::create("generated/replays.json").unwrap();
-    // serde_json::to_writer(&replay_output, &mapped_replays);
-
     let build_output = File::create("generated/builds.json").unwrap();
     serde_json::to_writer(&build_output, &build_tokens.builds);
 
     let raw_build_tree_output = File::create("generated/raw_build_tree.json").unwrap();
     serde_json::to_writer(&raw_build_tree_output, &build_tokens.raw_build_tree);
-
-    // let raw_unit_tree_output = File::create("generated/raw_unit_tree.json").unwrap();
-    // serde_json::to_writer(&raw_unit_tree_output, &build_tokens.raw_unit_tree);
 
     let build_token_output = File::create("generated/tokens.json").unwrap();
     serde_json::to_writer(&build_token_output, &build_tokens.build_token_path_mappings);
@@ -251,13 +190,6 @@ fn main() {
         wtr.serialize(record).unwrap();
     }
     wtr.flush().unwrap();
-
-    // File::create("tinybird_sc2_timelines.csv").unwrap();
-    // let mut wtr = Writer::from_path("tinybird_sc2_timelines.csv").unwrap();
-    // for record in &tinybird_timelines {
-    //   wtr.serialize(record).unwrap();
-    // }
-    // wtr.flush().unwrap();
 
     println!("replays serialized in {:?}", now.elapsed());
 }
