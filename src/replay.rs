@@ -56,17 +56,14 @@ pub struct Replay {
 }
 
 impl<'a> Replay {
-    pub fn new(file_path: PathBuf, content_hash: String, tags: Vec<&'a str>) -> Replay {
-        let path_str = file_path.to_str().unwrap();
-        println!("parsing replay {:?}", path_str);
-        let bytes = std::fs::read(path_str).expect("Failed to read replay file");
+    pub fn new(bytes: Vec<u8>, path: &str, content_hash: String, tags: Vec<&'a str>) -> Replay {
         let cursor = Cursor::new(bytes);
         let reader = BufReader::new(cursor);
         let archive = MPQArchive::new(reader);
         let protocol: Protocol = Protocol::new();
         let parsed = Replay::parse(archive, protocol, tags);
         Replay {
-            file_path: path_str.to_string(),
+            file_path: path.to_string(),
             content_hash,
             parsed,
         }

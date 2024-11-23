@@ -58,7 +58,11 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                         //   bucket_path,
                         // ).expect("Replay file is copied from existing file structure into bucket structure");
 
-                        let replay = Replay::new(path, content_hash, tags);
+                        let path_str = path.to_str().unwrap();
+                        println!("parsing replay {:?}", path_str);
+                        let bytes = std::fs::read(path_str).expect("Failed to read replay file");
+                
+                        let replay = Replay::new(bytes, path_str, content_hash, tags);
 
                         let raw_played_at = &replay
                             .parsed
