@@ -9,18 +9,9 @@ mod protocol;
 mod replay;
 mod utils;
 
-use crate::builds::Builds;
-use crate::parser::{ReplayParser, ReplaySummary};
-use crate::replay::Replay;
-use crate::utils::visit_dirs;
 
-use csv::Writer;
 use serde::Serialize;
-use std::collections::HashSet;
-use std::fs::File;
-use std::path::Path;
 
-use std::time::Instant;
 use wasm_bindgen::prelude::*;
 
 extern crate console_error_panic_hook;
