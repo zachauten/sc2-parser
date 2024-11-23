@@ -6,7 +6,6 @@ use crate::utils;
 use serde::{Deserialize, Serialize};
 
 use std::io::{BufReader, Cursor, Read, Seek};
-use std::time::Instant;
 
 use wasm_bindgen::prelude::*;
 
@@ -67,7 +66,6 @@ impl Replay {
         content_hash: String,
         tags: Vec<String>,
     ) -> JsValue {
-        set_panic_hook();
         let replay = Self::new(bytes, path, content_hash, tags);
         serde_wasm_bindgen::to_value(&replay).unwrap()
     }
@@ -92,7 +90,6 @@ impl Replay {
         protocol: Protocol,
         tags: Vec<String>,
     ) -> Parsed {
-        let now = Instant::now();
 
         // let header_content = &self.archive
         //   .header
@@ -124,8 +121,6 @@ impl Replay {
         // let game_events = self.protocol.decode_replay_game_events(game_info);
         // // println!("decoding replay game events {:.2?}", now.elapsed());
 
-        println!("parsed in {:.2?}", now.elapsed());
-
         Parsed {
             player_info,
             tracker_events,
@@ -140,15 +135,4 @@ impl Replay {
     // pub fn peek() {
 
     // }
-}
-
-fn set_panic_hook() {
-    // When the `console_error_panic_hook` feature is enabled, we can call the
-    // `set_panic_hook` function at least once during initialization, and then
-    // we will get better error messages if our code ever panics.
-    //
-    // For more details see
-    // https://github.com/rustwasm/console_error_panic_hook#readme
-    #[cfg(feature = "console_error_panic_hook")]
-    console_error_panic_hook::set_once();
 }

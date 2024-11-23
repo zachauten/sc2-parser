@@ -22,6 +22,8 @@ use std::path::Path;
 
 use std::time::Instant;
 use wasm_bindgen::prelude::*;
+extern crate console_error_panic_hook;
+
 
 #[derive(Serialize)]
 #[serde(untagged)]
@@ -263,5 +265,6 @@ fn main() {
 
 #[wasm_bindgen]
 pub fn test() -> String {
+    console_error_panic_hook::set_once();
     return "Hello world!".to_string();
 }
