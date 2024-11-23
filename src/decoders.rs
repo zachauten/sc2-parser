@@ -152,12 +152,12 @@ pub type EventEntry = (String, DecoderResult);
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum DecoderResult {
     Name(String),
-    Value(i64),
+    Value(i128),
     Blob(String),
     Array(Vec<DecoderResult>),
     DataFragment(u32),
-    Pair((i64, i16)),
-    Gameloop((String, i64)),
+    Pair((i128, i16)),
+    Gameloop((String, i128)),
     Bool(bool),
     Struct(Vec<EventEntry>),
     Null,
@@ -223,7 +223,7 @@ pub trait Decoder {
     fn _choice(
         &mut self,
         bounds: &Int,
-        fields: &Vec<(i64, (&str, u8))>,
+        fields: &Vec<(i128, (&str, u8))>,
         event_allowed: bool,
     ) -> DecoderResult;
 
@@ -241,7 +241,7 @@ impl<'a> BitPackedDecoder<'a> {
 impl Decoder for BitPackedDecoder<'_> {
     fn _int(&mut self, bounds: &Int) -> DecoderResult {
         let read = self.buffer.read_bits(bounds.1);
-        DecoderResult::Value(bounds.0 + read as i64)
+        DecoderResult::Value(bounds.0 + read as i128)
     }
 
     fn _blob(&mut self, bounds: &Int) -> DecoderResult {
@@ -312,7 +312,7 @@ impl Decoder for BitPackedDecoder<'_> {
     fn _choice(
         &mut self,
         bounds: &Int,
-        fields: &Vec<(i64, (&str, u8))>,
+        fields: &Vec<(i128, (&str, u8))>,
         event_allowed: bool,
     ) -> DecoderResult {
         let tag = match self._int(bounds) {
@@ -340,7 +340,7 @@ impl Decoder for BitPackedDecoder<'_> {
         let mut result = Vec::with_capacity(fields.len());
         for field in fields {
             // appears that this isn't needed since field is never parent
-            // match fields.into_iter().find(|f| f.2 as i64 == tag) {
+            // match fields.into_iter().find(|f| f.2 as i128 == tag) {
             //   Some(field) => {
             //   if field.0 == "__parent" {
             //     let parent = self.instance(self.typeinfos, field.1);
@@ -381,14 +381,14 @@ impl<'a> VersionedDecoder<'a> {
         }
     }
 
-    fn _vint(&mut self) -> i64 {
-        let mut buf = self.buffer.read_bits(8) as i64;
+    fn _vint(&mut self) -> i128 {
+        let mut buf = self.buffer.read_bits(8) as i128;
         let negative = buf & 1;
-        let mut result: i64 = (buf >> 1) & 0x3f;
+        let mut result: i128 = (buf >> 1) & 0x3f;
         let mut bits = 6;
 
         while (buf & 0x80) != 0 {
-            buf = self.buffer.read_bits(8) as i64;
+            buf = self.buffer.read_bits(8) as i128;
             result |= (buf & 0x7f) << bits;
             bits += 7;
         }
@@ -440,7 +440,7 @@ impl<'a> VersionedDecoder<'a> {
             // u32
             self.buffer.read_aligned_bytes(4);
         } else if skip == 8 {
-            // u64
+            // u128
             self.buffer.read_aligned_bytes(8);
         } else if skip == 9 {
             // vint
@@ -521,7 +521,7 @@ impl Decoder for VersionedDecoder<'_> {
     fn _choice(
         &mut self,
         bounds: &Int,
-        fields: &Vec<(i64, (&str, u8))>,
+        fields: &Vec<(i128, (&str, u8))>,
         event_allowed: bool,
     ) -> DecoderResult {
         self.expect_skip(3);
@@ -554,7 +554,7 @@ impl Decoder for VersionedDecoder<'_> {
             let tag = self._vint();
 
             // appears that this isn't needed since field is never parent
-            // match fields.into_iter().find(|f| f.2 as i64 == tag) {
+            // match fields.into_iter().find(|f| f.2 as i128 == tag) {
             //   Some(field) => {
             //   if field.0 == "__parent" {
             //     let parent = self.instance(self.typeinfos, field.1);
@@ -570,7 +570,7 @@ impl Decoder for VersionedDecoder<'_> {
             // };
 
             // field always seems to exist?
-            let field = fields.iter().find(|f| f.2 as i64 == tag).unwrap();
+            let field = fields.iter().find(|f| f.2 as i128 == tag).unwrap();
             let field_value = self.instance(self.typeinfos, &field.1, event_allowed);
             match event_allowed {
                 true => result.push((field.0.to_string(), field_value)),

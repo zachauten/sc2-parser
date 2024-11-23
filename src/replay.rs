@@ -90,7 +90,6 @@ impl Replay {
         protocol: Protocol,
         tags: Vec<String>,
     ) -> Parsed {
-
         // let header_content = &self.archive
         //   .header
         //   .user_data_header

@@ -24,7 +24,6 @@ use std::time::Instant;
 use wasm_bindgen::prelude::*;
 extern crate console_error_panic_hook;
 
-
 #[derive(Serialize)]
 #[serde(untagged)]
 pub enum SummaryStat {
@@ -61,7 +60,7 @@ pub struct TinybirdGame {
     builds: String,
     map: String,
     game_length: u16,
-    played_at: u64,
+    played_at: u128,
     event: String,
     // game_version: String,
 }
@@ -92,7 +91,7 @@ pub struct TinybirdTimelineEntry {
     map: String,
     event: String,
     game_length: u16,
-    played_at: u64,
+    played_at: u128,
     game_version: String,
 }
 

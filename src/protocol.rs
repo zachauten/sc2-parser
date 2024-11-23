@@ -244,12 +244,12 @@ const GAME_DETAILS_TYPEID: u8 = 40;
 const REPLAY_INITDATA_TYPEID: u8 = 73;
 
 fn instantiate_event_types<'a>() -> (
-    HashMap<i64, (u8, &'a str)>,
-    HashMap<i64, (u8, &'a str)>,
-    HashMap<i64, (u8, &'a str)>,
+    HashMap<i128, (u8, &'a str)>,
+    HashMap<i128, (u8, &'a str)>,
+    HashMap<i128, (u8, &'a str)>,
 ) {
     //  Map from protocol NNet.Game.*Event eventid to (typeid, name)
-    let game_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
+    let game_event_types: HashMap<i128, (u8, &str)> = HashMap::from([
         (5, (82, "NNet.s.SUserFinishedLoadingSyncEvent")),
         (7, (81, "NNet.Game.SUserOptionsEvent")),
         (9, (74, "NNet.Game.SBankFileEvent")),
@@ -397,7 +397,7 @@ fn instantiate_event_types<'a>() -> (
     ]);
 
     //  Map from protocol NNet.Replay.Tracker.*Event eventid to (typeid, name)
-    let tracker_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
+    let tracker_event_types: HashMap<i128, (u8, &str)> = HashMap::from([
         (0, (197, "NNet.Replay.Tracker.SPlayerStatsEvent")),
         (1, (199, "NNet.Replay.Tracker.SUnitBornEvent")),
         (2, (200, "NNet.Replay.Tracker.SUnitDiedEvent")),
@@ -411,7 +411,7 @@ fn instantiate_event_types<'a>() -> (
     ]);
 
     //  Map from protocol NNet.Game.*Message eventid to (typeid, name)
-    let message_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
+    let message_event_types: HashMap<i128, (u8, &str)> = HashMap::from([
         (0, (192, "NNet.Game.SChatMessage")),
         (1, (193, "NNet.Game.SPingMessage")),
         (2, (194, "NNet.Game.SLoadingProgressMessage")),
@@ -423,7 +423,7 @@ fn instantiate_event_types<'a>() -> (
 }
 
 #[derive(Debug, Copy, Clone)]
-pub struct Int(pub i64, pub u8);
+pub struct Int(pub i128, pub u8);
 
 #[derive(Debug)]
 pub struct Struct<'a>(pub &'a str, pub u8, pub i8);
@@ -432,7 +432,7 @@ pub struct Struct<'a>(pub &'a str, pub u8, pub i8);
 pub enum ProtocolTypeInfo<'a> {
     Int(Int),
     Blob(Int),
-    Choice(Int, Vec<(i64, (&'a str, u8))>),
+    Choice(Int, Vec<(i128, (&'a str, u8))>),
     Struct(Vec<Struct<'a>>),
     Bool,
     Optional(u8),
@@ -451,7 +451,7 @@ fn match_typeinfo_structure(c: char) -> bool {
 fn handle_int(input: &str) -> Int {
     let mut ints = input.trim_matches(match_typeinfo_structure).split(',');
     Int(
-        ints.next().unwrap().parse::<i64>().unwrap(),
+        ints.next().unwrap().parse::<i128>().unwrap(),
         ints.next().unwrap().parse::<u8>().unwrap(),
     )
 }
@@ -496,7 +496,7 @@ fn handle_choice(input: &str) -> ProtocolTypeInfo {
 
     for choice in raw_choices {
         let mut kv_pair = choice.split(':');
-        let key = kv_pair.next().unwrap().parse::<i64>().unwrap();
+        let key = kv_pair.next().unwrap().parse::<i128>().unwrap();
         let value = kv_pair.next().unwrap();
         choices.push((key, parse_choice(value)));
     }
@@ -568,9 +568,9 @@ const ALLOWED_EVENTS: [&str; 5] = [
 
 pub struct Protocol<'a> {
     typeinfos: Vec<ProtocolTypeInfo<'a>>,
-    game_event_types: HashMap<i64, (u8, &'a str)>,
-    tracker_event_types: HashMap<i64, (u8, &'a str)>,
-    message_event_types: HashMap<i64, (u8, &'a str)>,
+    game_event_types: HashMap<i128, (u8, &'a str)>,
+    tracker_event_types: HashMap<i128, (u8, &'a str)>,
+    message_event_types: HashMap<i128, (u8, &'a str)>,
 }
 
 impl<'a> Protocol<'a> {

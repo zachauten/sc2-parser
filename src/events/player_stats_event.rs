@@ -37,11 +37,11 @@ impl PlayerStatsEvent {
                     if let DecoderResult::Struct(entries) = value {
                         let player_index = (player_id - 1) as usize;
 
-                        let mut event_minerals_collected: i64 = 0;
-                        let mut event_minerals_lost: i64 = 0;
+                        let mut event_minerals_collected: i128 = 0;
+                        let mut event_minerals_lost: i128 = 0;
 
-                        let mut event_gas_collected: i64 = 0;
-                        let mut event_gas_lost: i64 = 0;
+                        let mut event_gas_collected: i128 = 0;
+                        let mut event_gas_lost: i128 = 0;
 
                         let mut event_minerals_collection_rate: u16 = 0;
                         let mut event_gas_collection_rate: u16 = 0;

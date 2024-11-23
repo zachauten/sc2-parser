@@ -30,7 +30,7 @@ pub struct ReplaySummary {
     pub winner: u8,
     pub game_length: u16,
     pub map: String,
-    pub played_at: u64,
+    pub played_at: u128,
     pub tags: String,
     pub tinybird: TinybirdGame,
     pub timeline: Vec<TinybirdTimelineEntry>,
@@ -47,7 +47,7 @@ pub struct TimelineContext {
     pub event: String,
     pub matchup: String,
     pub game_length: u16,
-    pub played_at: u64,
+    pub played_at: u128,
     pub game_version: String,
 }
 
@@ -182,7 +182,7 @@ impl<'a> ReplayParser<'a> {
         let mut played_at = 0;
         if let DecoderResult::Value(value) = raw_played_at {
             // TODO: this truncation is not working properly
-            played_at = value.clone() as u64;
+            played_at = value.clone() as u128;
         }
         // game records time in window epoch for some reason
         // https://en.wikipedia.org/wiki/Epoch_(computing)

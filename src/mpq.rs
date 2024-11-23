@@ -50,7 +50,7 @@ pub struct MPQFileHeader {
 // MPQFileHeader.struct_format = '< 4s 2I 2H 4I' = 4 + 8 + 4 + 16 = 32 bytes
 
 struct MPQFileHeaderExt {
-    extended_block_table_offset: i64,
+    extended_block_table_offset: i128,
     hash_table_offset_high: i16,
     block_table_offset_high: i16,
 }
@@ -99,7 +99,7 @@ pub struct MPQArchive<T: Seek + Read> {
     pub header: MPQFileHeader,
     hash_table: Vec<MPQTableEntry>,
     block_table: Vec<MPQTableEntry>,
-    encryption_table: HashMap<u64, u64>,
+    encryption_table: HashMap<u128, u128>,
     compressed: Vec<u8>,
     decompressed_offsets: Vec<usize>,
     compression_type: u8,
@@ -193,7 +193,8 @@ impl<T: Seek + Read> MPQArchive<T> {
             file.read_exact(&mut block_table_offset_high).unwrap();
 
             header_extension = Some(MPQFileHeaderExt {
-                extended_block_table_offset: i64::from_ne_bytes(extended_block_table_offset),
+                extended_block_table_offset: i64::from_ne_bytes(extended_block_table_offset)
+                    as i128,
                 hash_table_offset_high: i16::from_ne_bytes(hash_table_offset_high),
                 block_table_offset_high: i16::from_ne_bytes(block_table_offset_high),
             });
@@ -242,7 +243,7 @@ impl<T: Seek + Read> MPQArchive<T> {
     fn read_table(
         file: &mut BufReader<T>,
         header: &MPQFileHeader,
-        table: &HashMap<u64, u64>,
+        table: &HashMap<u128, u128>,
         table_entry_type: &str,
     ) -> Vec<MPQTableEntry> {
         let (table_offset, table_entries, key) = match table_entry_type {
@@ -311,8 +312,8 @@ impl<T: Seek + Read> MPQArchive<T> {
         table_values
     }
 
-    fn prepare_encryption_table() -> HashMap<u64, u64> {
-        let mut seed: u64 = 0x00100001;
+    fn prepare_encryption_table() -> HashMap<u128, u128> {
+        let mut seed: u128 = 0x00100001;
         let mut encryption_table = HashMap::new();
 
         for i in 0..256 {
@@ -333,31 +334,31 @@ impl<T: Seek + Read> MPQArchive<T> {
         encryption_table
     }
 
-    fn hash(table: &HashMap<u64, u64>, string: &str, hash_type: MPQHash) -> u64 {
-        let mut seed1: u64 = 0x7FED7FED;
-        let mut seed2: u64 = 0xEEEEEEEE;
+    fn hash(table: &HashMap<u128, u128>, string: &str, hash_type: MPQHash) -> u128 {
+        let mut seed1: u128 = 0x7FED7FED;
+        let mut seed2: u128 = 0xEEEEEEEE;
 
         for byte in string.to_uppercase().bytes() {
-            let value: u64 = table[&(((hash_type as u64) << 8) + byte as u64)];
+            let value: u128 = table[&(((hash_type as u128) << 8) + byte as u128)];
             seed1 = (value ^ (seed1 + seed2)) & 0xFFFFFFFF;
-            seed2 = (byte as u64 + seed1 + seed2 + (seed2 << 5) + 3) & 0xFFFFFFFF;
+            seed2 = (byte as u128 + seed1 + seed2 + (seed2 << 5) + 3) & 0xFFFFFFFF;
         }
 
         seed1
     }
 
-    fn decrypt(table: &HashMap<u64, u64>, data: &[u8], key: u64) -> Vec<u8> {
-        let mut seed1: u64 = key;
-        let mut seed2: u64 = 0xEEEEEEEE;
+    fn decrypt(table: &HashMap<u128, u128>, data: &[u8], key: u128) -> Vec<u8> {
+        let mut seed1: u128 = key;
+        let mut seed2: u128 = 0xEEEEEEEE;
         let mut result = vec![];
 
         for i in 0..(data.len() / 4) {
-            seed2 += table[&(0x400 + (seed1 & 0xFF))] as u64;
+            seed2 += table[&(0x400 + (seed1 & 0xFF))] as u128;
             seed2 &= 0xFFFFFFFF;
 
             let position = i * 4;
             let value_bytes: [u8; 4] = (&data[position..position + 4]).try_into().unwrap();
-            let mut value = u32::from_le_bytes(value_bytes) as u64;
+            let mut value = u32::from_le_bytes(value_bytes) as u128;
             value = (value ^ (seed1 + seed2)) & 0xFFFFFFFF;
 
             seed1 = ((!seed1 << 0x15) + 0x11111111) | (seed1 >> 0x0B);
@@ -424,7 +425,7 @@ impl<T: Seek + Read> MPQArchive<T> {
 
     fn read_block_entry(
         archive_filename: &str,
-        encryption_table: &HashMap<u64, u64>,
+        encryption_table: &HashMap<u128, u128>,
         hash_table: &[MPQTableEntry],
         block_table: &[MPQTableEntry],
     ) -> Option<BlockTableEntry> {
@@ -462,7 +463,7 @@ impl<T: Seek + Read> MPQArchive<T> {
     }
 
     fn get_hash_table_entry(
-        encryption_table: &HashMap<u64, u64>,
+        encryption_table: &HashMap<u128, u128>,
         hash_table: &[MPQTableEntry],
         archive_filename: &str,
     ) -> Option<HashTableEntry> {
@@ -471,7 +472,8 @@ impl<T: Seek + Read> MPQArchive<T> {
 
         for entry in hash_table {
             if let MPQTableEntry::Hash(table_entry) = entry {
-                if (table_entry.hash_a as u64) == hash_a && (table_entry.hash_b as u64) == hash_b {
+                if (table_entry.hash_a as u128) == hash_a && (table_entry.hash_b as u128) == hash_b
+                {
                     return Some(*table_entry);
                 }
             };

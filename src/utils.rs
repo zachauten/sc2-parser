@@ -73,7 +73,7 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                         let mut played_at = 0;
                         if let DecoderResult::Value(value) = raw_played_at {
                             // TODO: this truncation is not working properly
-                            played_at = value.clone() as u64;
+                            played_at = value.clone() as u128;
                         }
                         // game records time in window epoch for some reason
                         // https://en.wikipedia.org/wiki/Epoch_(computing)
