@@ -1,10 +1,4 @@
-use crate::decoders::{
-  Decoder,
-  DecoderResult,
-  BitPackedDecoder,
-  VersionedDecoder,
-  EventEntry,
-};
+use crate::decoders::{BitPackedDecoder, Decoder, DecoderResult, EventEntry, VersionedDecoder};
 
 use crate::replay::Event;
 use std::collections::HashMap;
@@ -250,182 +244,182 @@ const GAME_DETAILS_TYPEID: u8 = 40;
 const REPLAY_INITDATA_TYPEID: u8 = 73;
 
 fn instantiate_event_types<'a>() -> (
-  HashMap<i64, (u8, &'a str)>,
-  HashMap<i64, (u8, &'a str)>,
-  HashMap<i64, (u8, &'a str)>,
+    HashMap<i64, (u8, &'a str)>,
+    HashMap<i64, (u8, &'a str)>,
+    HashMap<i64, (u8, &'a str)>,
 ) {
-  //  Map from protocol NNet.Game.*Event eventid to (typeid, name)
-  let game_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
-    (5, (82, "NNet.s.SUserFinishedLoadingSyncEvent")),
-    (7, (81, "NNet.Game.SUserOptionsEvent")),
-    (9, (74, "NNet.Game.SBankFileEvent")),
-    (10, (76, "NNet.Game.SBankSectionEvent")),
-    (11, (77, "NNet.Game.SBankKeyEvent")),
-    (12, (78, "NNet.Game.SBankValueEvent")),
-    (13, (80, "NNet.Game.SBankSignatureEvent")),
-    (14, (85, "NNet.Game.SCameraSaveEvent")),
-    (21, (86, "NNet.Game.SSaveGameEvent")),
-    (22, (82, "NNet.Game.SSaveGameDoneEvent")),
-    (23, (82, "NNet.Game.SLoadGameDoneEvent")),
-    (25, (87, "NNet.Game.SCommandManagerResetEvent")),
-    (26, (90, "NNet.Game.SGameCheatEvent")),
-    (27, (100, "NNet.Game.SCmdEvent")),
-    (28, (109, "NNet.Game.SSelectionDeltaEvent")),
-    (29, (110, "NNet.Game.SControlGroupUpdateEvent")),
-    (30, (112, "NNet.Game.SSelectionSyncCheckEvent")),
-    (31, (114, "NNet.Game.SResourceTradeEvent")),
-    (32, (115, "NNet.Game.STriggerChatMessageEvent")),
-    (33, (118, "NNet.Game.SAICommunicateEvent")),
-    (34, (119, "NNet.Game.SSetAbsoluteGameSpeedEvent")),
-    (35, (120, "NNet.Game.SAddAbsoluteGameSpeedEvent")),
-    (36, (121, "NNet.Game.STriggerPingEvent")),
-    (37, (122, "NNet.Game.SBroadcastCheatEvent")),
-    (38, (123, "NNet.Game.SAllianceEvent")),
-    (39, (124, "NNet.Game.SUnitClickEvent")),
-    (40, (125, "NNet.Game.SUnitHighlightEvent")),
-    (41, (126, "NNet.Game.STriggerReplySelectedEvent")),
-    (43, (131, "NNet.Game.SHijackReplayGameEvent")),
-    (44, (82, "NNet.Game.STriggerSkippedEvent")),
-    (45, (136, "NNet.Game.STriggerSoundLengthQueryEvent")),
-    (46, (143, "NNet.Game.STriggerSoundOffsetEvent")),
-    (47, (144, "NNet.Game.STriggerTransmissionOffsetEvent")),
-    (48, (145, "NNet.Game.STriggerTransmissionCompleteEvent")),
-    (49, (149, "NNet.Game.SCameraUpdateEvent")),
-    (50, (82, "NNet.Game.STriggerAbortMissionEvent")),
-    (51, (132, "NNet.Game.STriggerPurchaseMadeEvent")),
-    (52, (82, "NNet.Game.STriggerPurchaseExitEvent")),
-    (53, (133, "NNet.Game.STriggerPlanetMissionLaunchedEvent")),
-    (54, (82, "NNet.Game.STriggerPlanetPanelCanceledEvent")),
-    (55, (135, "NNet.Game.STriggerDialogControlEvent")),
-    (56, (139, "NNet.Game.STriggerSoundLengthSyncEvent")),
-    (57, (150, "NNet.Game.STriggerConversationSkippedEvent")),
-    (58, (153, "NNet.Game.STriggerMouseClickedEvent")),
-    (59, (154, "NNet.Game.STriggerMouseMovedEvent")),
-    (60, (155, "NNet.Game.SAchievementAwardedEvent")),
-    (61, (156, "NNet.Game.STriggerHotkeyPressedEvent")),
-    (62, (157, "NNet.Game.STriggerTargetModeUpdateEvent")),
-    (63, (82, "NNet.Game.STriggerPlanetPanelReplayEvent")),
-    (64, (158, "NNet.Game.STriggerSoundtrackDoneEvent")),
-    (65, (159, "NNet.Game.STriggerPlanetMissionSelectedEvent")),
-    (66, (160, "NNet.Game.STriggerKeyPressedEvent")),
-    (67, (171, "NNet.Game.STriggerMovieFunctionEvent")),
-    (68, (82, "NNet.Game.STriggerPlanetPanelBirthCompleteEvent")),
-    (69, (82, "NNet.Game.STriggerPlanetPanelDeathCompleteEvent")),
-    (70, (161, "NNet.Game.SResourceRequestEvent")),
-    (71, (162, "NNet.Game.SResourceRequestFulfillEvent")),
-    (72, (163, "NNet.Game.SResourceRequestCancelEvent")),
-    (73, (82, "NNet.Game.STriggerResearchPanelExitEvent")),
-    (74, (82, "NNet.Game.STriggerResearchPanelPurchaseEvent")),
-    (
-      75,
-      (165, "NNet.Game.STriggerResearchPanelSelectionChangedEvent"),
-    ),
-    (76, (164, "NNet.Game.STriggerCommandErrorEvent")),
-    (77, (82, "NNet.Game.STriggerMercenaryPanelExitEvent")),
-    (78, (82, "NNet.Game.STriggerMercenaryPanelPurchaseEvent")),
-    (
-      79,
-      (166, "NNet.Game.STriggerMercenaryPanelSelectionChangedEvent"),
-    ),
-    (80, (82, "NNet.Game.STriggerVictoryPanelExitEvent")),
-    (81, (82, "NNet.Game.STriggerBattleReportPanelExitEvent")),
-    (
-      82,
-      (167, "NNet.Game.STriggerBattleReportPanelPlayMissionEvent"),
-    ),
-    (
-      83,
-      (168, "NNet.Game.STriggerBattleReportPanelPlaySceneEvent"),
-    ),
-    (
-      84,
-      (
-        168,
-        "NNet.Game.STriggerBattleReportPanelSelectionChangedEvent",
-      ),
-    ),
-    (
-      85,
-      (133, "NNet.Game.STriggerVictoryPanelPlayMissionAgainEvent"),
-    ),
-    (86, (82, "NNet.Game.STriggerMovieStartedEvent")),
-    (87, (82, "NNet.Game.STriggerMovieFinishedEvent")),
-    (88, (169, "NNet.Game.SDecrementGameTimeRemainingEvent")),
-    (89, (170, "NNet.Game.STriggerPortraitLoadedEvent")),
-    (90, (172, "NNet.Game.STriggerCustomDialogDismissedEvent")),
-    (91, (173, "NNet.Game.STriggerGameMenuItemSelectedEvent")),
-    (92, (175, "NNet.Game.STriggerMouseWheelEvent")),
-    (
-      93,
-      (
-        132,
-        "NNet.Game.STriggerPurchasePanelSelectedPurchaseItemChangedEvent",
-      ),
-    ),
-    (
-      94,
-      (
-        176,
-        "NNet.Game.STriggerPurchasePanelSelectedPurchaseCategoryChangedEvent",
-      ),
-    ),
-    (95, (177, "NNet.Game.STriggerButtonPressedEvent")),
-    (96, (82, "NNet.Game.STriggerGameCreditsFinishedEvent")),
-    (97, (178, "NNet.Game.STriggerCutsceneBookmarkFiredEvent")),
-    (98, (179, "NNet.Game.STriggerCutsceneEndSceneFiredEvent")),
-    (99, (180, "NNet.Game.STriggerCutsceneConversationLineEvent")),
-    (
-      100,
-      (
-        181,
-        "NNet.Game.STriggerCutsceneConversationLineMissingEvent",
-      ),
-    ),
-    (101, (182, "NNet.Game.SGameUserLeaveEvent")),
-    (102, (183, "NNet.Game.SGameUserJoinEvent")),
-    (103, (185, "NNet.Game.SCommandManagerStateEvent")),
-    (104, (186, "NNet.Game.SCmdUpdateTargetPointEvent")),
-    (105, (187, "NNet.Game.SCmdUpdateTargetUnitEvent")),
-    (106, (140, "NNet.Game.STriggerAnimLengthQueryByNameEvent")),
-    (107, (141, "NNet.Game.STriggerAnimLengthQueryByPropsEvent")),
-    (108, (142, "NNet.Game.STriggerAnimOffsetEvent")),
-    (109, (188, "NNet.Game.SCatalogModifyEvent")),
-    (110, (189, "NNet.Game.SHeroTalentTreeSelectedEvent")),
-    (111, (82, "NNet.Game.STriggerProfilerLoggingFinishedEvent")),
-    (
-      112,
-      (190, "NNet.Game.SHeroTalentTreeSelectionPanelToggledEvent"),
-    ),
-    (116, (191, "NNet.Game.SSetSyncLoadingTimeEvent")),
-    (117, (191, "NNet.Game.SSetSyncPlayingTimeEvent")),
-    (118, (191, "NNet.Game.SPeerSetSyncLoadingTimeEvent")),
-    (119, (191, "NNet.Game.SPeerSetSyncPlayingTimeEvent")),
-  ]);
+    //  Map from protocol NNet.Game.*Event eventid to (typeid, name)
+    let game_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
+        (5, (82, "NNet.s.SUserFinishedLoadingSyncEvent")),
+        (7, (81, "NNet.Game.SUserOptionsEvent")),
+        (9, (74, "NNet.Game.SBankFileEvent")),
+        (10, (76, "NNet.Game.SBankSectionEvent")),
+        (11, (77, "NNet.Game.SBankKeyEvent")),
+        (12, (78, "NNet.Game.SBankValueEvent")),
+        (13, (80, "NNet.Game.SBankSignatureEvent")),
+        (14, (85, "NNet.Game.SCameraSaveEvent")),
+        (21, (86, "NNet.Game.SSaveGameEvent")),
+        (22, (82, "NNet.Game.SSaveGameDoneEvent")),
+        (23, (82, "NNet.Game.SLoadGameDoneEvent")),
+        (25, (87, "NNet.Game.SCommandManagerResetEvent")),
+        (26, (90, "NNet.Game.SGameCheatEvent")),
+        (27, (100, "NNet.Game.SCmdEvent")),
+        (28, (109, "NNet.Game.SSelectionDeltaEvent")),
+        (29, (110, "NNet.Game.SControlGroupUpdateEvent")),
+        (30, (112, "NNet.Game.SSelectionSyncCheckEvent")),
+        (31, (114, "NNet.Game.SResourceTradeEvent")),
+        (32, (115, "NNet.Game.STriggerChatMessageEvent")),
+        (33, (118, "NNet.Game.SAICommunicateEvent")),
+        (34, (119, "NNet.Game.SSetAbsoluteGameSpeedEvent")),
+        (35, (120, "NNet.Game.SAddAbsoluteGameSpeedEvent")),
+        (36, (121, "NNet.Game.STriggerPingEvent")),
+        (37, (122, "NNet.Game.SBroadcastCheatEvent")),
+        (38, (123, "NNet.Game.SAllianceEvent")),
+        (39, (124, "NNet.Game.SUnitClickEvent")),
+        (40, (125, "NNet.Game.SUnitHighlightEvent")),
+        (41, (126, "NNet.Game.STriggerReplySelectedEvent")),
+        (43, (131, "NNet.Game.SHijackReplayGameEvent")),
+        (44, (82, "NNet.Game.STriggerSkippedEvent")),
+        (45, (136, "NNet.Game.STriggerSoundLengthQueryEvent")),
+        (46, (143, "NNet.Game.STriggerSoundOffsetEvent")),
+        (47, (144, "NNet.Game.STriggerTransmissionOffsetEvent")),
+        (48, (145, "NNet.Game.STriggerTransmissionCompleteEvent")),
+        (49, (149, "NNet.Game.SCameraUpdateEvent")),
+        (50, (82, "NNet.Game.STriggerAbortMissionEvent")),
+        (51, (132, "NNet.Game.STriggerPurchaseMadeEvent")),
+        (52, (82, "NNet.Game.STriggerPurchaseExitEvent")),
+        (53, (133, "NNet.Game.STriggerPlanetMissionLaunchedEvent")),
+        (54, (82, "NNet.Game.STriggerPlanetPanelCanceledEvent")),
+        (55, (135, "NNet.Game.STriggerDialogControlEvent")),
+        (56, (139, "NNet.Game.STriggerSoundLengthSyncEvent")),
+        (57, (150, "NNet.Game.STriggerConversationSkippedEvent")),
+        (58, (153, "NNet.Game.STriggerMouseClickedEvent")),
+        (59, (154, "NNet.Game.STriggerMouseMovedEvent")),
+        (60, (155, "NNet.Game.SAchievementAwardedEvent")),
+        (61, (156, "NNet.Game.STriggerHotkeyPressedEvent")),
+        (62, (157, "NNet.Game.STriggerTargetModeUpdateEvent")),
+        (63, (82, "NNet.Game.STriggerPlanetPanelReplayEvent")),
+        (64, (158, "NNet.Game.STriggerSoundtrackDoneEvent")),
+        (65, (159, "NNet.Game.STriggerPlanetMissionSelectedEvent")),
+        (66, (160, "NNet.Game.STriggerKeyPressedEvent")),
+        (67, (171, "NNet.Game.STriggerMovieFunctionEvent")),
+        (68, (82, "NNet.Game.STriggerPlanetPanelBirthCompleteEvent")),
+        (69, (82, "NNet.Game.STriggerPlanetPanelDeathCompleteEvent")),
+        (70, (161, "NNet.Game.SResourceRequestEvent")),
+        (71, (162, "NNet.Game.SResourceRequestFulfillEvent")),
+        (72, (163, "NNet.Game.SResourceRequestCancelEvent")),
+        (73, (82, "NNet.Game.STriggerResearchPanelExitEvent")),
+        (74, (82, "NNet.Game.STriggerResearchPanelPurchaseEvent")),
+        (
+            75,
+            (165, "NNet.Game.STriggerResearchPanelSelectionChangedEvent"),
+        ),
+        (76, (164, "NNet.Game.STriggerCommandErrorEvent")),
+        (77, (82, "NNet.Game.STriggerMercenaryPanelExitEvent")),
+        (78, (82, "NNet.Game.STriggerMercenaryPanelPurchaseEvent")),
+        (
+            79,
+            (166, "NNet.Game.STriggerMercenaryPanelSelectionChangedEvent"),
+        ),
+        (80, (82, "NNet.Game.STriggerVictoryPanelExitEvent")),
+        (81, (82, "NNet.Game.STriggerBattleReportPanelExitEvent")),
+        (
+            82,
+            (167, "NNet.Game.STriggerBattleReportPanelPlayMissionEvent"),
+        ),
+        (
+            83,
+            (168, "NNet.Game.STriggerBattleReportPanelPlaySceneEvent"),
+        ),
+        (
+            84,
+            (
+                168,
+                "NNet.Game.STriggerBattleReportPanelSelectionChangedEvent",
+            ),
+        ),
+        (
+            85,
+            (133, "NNet.Game.STriggerVictoryPanelPlayMissionAgainEvent"),
+        ),
+        (86, (82, "NNet.Game.STriggerMovieStartedEvent")),
+        (87, (82, "NNet.Game.STriggerMovieFinishedEvent")),
+        (88, (169, "NNet.Game.SDecrementGameTimeRemainingEvent")),
+        (89, (170, "NNet.Game.STriggerPortraitLoadedEvent")),
+        (90, (172, "NNet.Game.STriggerCustomDialogDismissedEvent")),
+        (91, (173, "NNet.Game.STriggerGameMenuItemSelectedEvent")),
+        (92, (175, "NNet.Game.STriggerMouseWheelEvent")),
+        (
+            93,
+            (
+                132,
+                "NNet.Game.STriggerPurchasePanelSelectedPurchaseItemChangedEvent",
+            ),
+        ),
+        (
+            94,
+            (
+                176,
+                "NNet.Game.STriggerPurchasePanelSelectedPurchaseCategoryChangedEvent",
+            ),
+        ),
+        (95, (177, "NNet.Game.STriggerButtonPressedEvent")),
+        (96, (82, "NNet.Game.STriggerGameCreditsFinishedEvent")),
+        (97, (178, "NNet.Game.STriggerCutsceneBookmarkFiredEvent")),
+        (98, (179, "NNet.Game.STriggerCutsceneEndSceneFiredEvent")),
+        (99, (180, "NNet.Game.STriggerCutsceneConversationLineEvent")),
+        (
+            100,
+            (
+                181,
+                "NNet.Game.STriggerCutsceneConversationLineMissingEvent",
+            ),
+        ),
+        (101, (182, "NNet.Game.SGameUserLeaveEvent")),
+        (102, (183, "NNet.Game.SGameUserJoinEvent")),
+        (103, (185, "NNet.Game.SCommandManagerStateEvent")),
+        (104, (186, "NNet.Game.SCmdUpdateTargetPointEvent")),
+        (105, (187, "NNet.Game.SCmdUpdateTargetUnitEvent")),
+        (106, (140, "NNet.Game.STriggerAnimLengthQueryByNameEvent")),
+        (107, (141, "NNet.Game.STriggerAnimLengthQueryByPropsEvent")),
+        (108, (142, "NNet.Game.STriggerAnimOffsetEvent")),
+        (109, (188, "NNet.Game.SCatalogModifyEvent")),
+        (110, (189, "NNet.Game.SHeroTalentTreeSelectedEvent")),
+        (111, (82, "NNet.Game.STriggerProfilerLoggingFinishedEvent")),
+        (
+            112,
+            (190, "NNet.Game.SHeroTalentTreeSelectionPanelToggledEvent"),
+        ),
+        (116, (191, "NNet.Game.SSetSyncLoadingTimeEvent")),
+        (117, (191, "NNet.Game.SSetSyncPlayingTimeEvent")),
+        (118, (191, "NNet.Game.SPeerSetSyncLoadingTimeEvent")),
+        (119, (191, "NNet.Game.SPeerSetSyncPlayingTimeEvent")),
+    ]);
 
-  //  Map from protocol NNet.Replay.Tracker.*Event eventid to (typeid, name)
-  let tracker_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
-    (0, (197, "NNet.Replay.Tracker.SPlayerStatsEvent")),
-    (1, (199, "NNet.Replay.Tracker.SUnitBornEvent")),
-    (2, (200, "NNet.Replay.Tracker.SUnitDiedEvent")),
-    (3, (201, "NNet.Replay.Tracker.SUnitOwnerChangeEvent")),
-    (4, (202, "NNet.Replay.Tracker.SUnitTypeChangeEvent")),
-    (5, (203, "NNet.Replay.Tracker.SUpgradeEvent")),
-    (6, (204, "NNet.Replay.Tracker.SUnitInitEvent")),
-    (7, (205, "NNet.Replay.Tracker.SUnitDoneEvent")),
-    (8, (207, "NNet.Replay.Tracker.SUnitPositionsEvent")),
-    (9, (208, "NNet.Replay.Tracker.SPlayerSetupEvent")),
-  ]);
+    //  Map from protocol NNet.Replay.Tracker.*Event eventid to (typeid, name)
+    let tracker_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
+        (0, (197, "NNet.Replay.Tracker.SPlayerStatsEvent")),
+        (1, (199, "NNet.Replay.Tracker.SUnitBornEvent")),
+        (2, (200, "NNet.Replay.Tracker.SUnitDiedEvent")),
+        (3, (201, "NNet.Replay.Tracker.SUnitOwnerChangeEvent")),
+        (4, (202, "NNet.Replay.Tracker.SUnitTypeChangeEvent")),
+        (5, (203, "NNet.Replay.Tracker.SUpgradeEvent")),
+        (6, (204, "NNet.Replay.Tracker.SUnitInitEvent")),
+        (7, (205, "NNet.Replay.Tracker.SUnitDoneEvent")),
+        (8, (207, "NNet.Replay.Tracker.SUnitPositionsEvent")),
+        (9, (208, "NNet.Replay.Tracker.SPlayerSetupEvent")),
+    ]);
 
-  //  Map from protocol NNet.Game.*Message eventid to (typeid, name)
-  let message_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
-    (0, (192, "NNet.Game.SChatMessage")),
-    (1, (193, "NNet.Game.SPingMessage")),
-    (2, (194, "NNet.Game.SLoadingProgressMessage")),
-    (3, (82, "NNet.Game.SServerPingMessage")),
-    (4, (195, "NNet.Game.SReconnectNotifyMessage")),
-  ]);
+    //  Map from protocol NNet.Game.*Message eventid to (typeid, name)
+    let message_event_types: HashMap<i64, (u8, &str)> = HashMap::from([
+        (0, (192, "NNet.Game.SChatMessage")),
+        (1, (193, "NNet.Game.SPingMessage")),
+        (2, (194, "NNet.Game.SLoadingProgressMessage")),
+        (3, (82, "NNet.Game.SServerPingMessage")),
+        (4, (195, "NNet.Game.SReconnectNotifyMessage")),
+    ]);
 
-  (game_event_types, tracker_event_types, message_event_types)
+    (game_event_types, tracker_event_types, message_event_types)
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -436,252 +430,258 @@ pub struct Struct<'a>(pub &'a str, pub u8, pub i8);
 
 #[derive(Debug)]
 pub enum ProtocolTypeInfo<'a> {
-  Int(Int),
-  Blob(Int),
-  Choice(Int, Vec<(i64, (&'a str, u8))>),
-  Struct(Vec<Struct<'a>>),
-  Bool,
-  Optional(u8),
-  FourCC,
-  Array(Int, u8),
-  BitArray(Int),
-  Null,
+    Int(Int),
+    Blob(Int),
+    Choice(Int, Vec<(i64, (&'a str, u8))>),
+    Struct(Vec<Struct<'a>>),
+    Bool,
+    Optional(u8),
+    FourCC,
+    Array(Int, u8),
+    BitArray(Int),
+    Null,
 }
 
 const CHAR_MATCH: [char; 5] = ['[', ']', '(', ')', ','];
 
 fn match_typeinfo_structure(c: char) -> bool {
-  CHAR_MATCH.contains(&c)
+    CHAR_MATCH.contains(&c)
 }
 
 fn handle_int(input: &str) -> Int {
-  let mut ints = input.trim_matches(match_typeinfo_structure).split(',');
-  Int(
-    ints.next().unwrap().parse::<i64>().unwrap(),
-    ints.next().unwrap().parse::<u8>().unwrap(),
-  )
+    let mut ints = input.trim_matches(match_typeinfo_structure).split(',');
+    Int(
+        ints.next().unwrap().parse::<i64>().unwrap(),
+        ints.next().unwrap().parse::<u8>().unwrap(),
+    )
 }
 
 fn handle_array(input: &str) -> ProtocolTypeInfo {
-  // structure: [(<int>, <int>), <int>], remove only square brackets first to preserve for int
-  let parts = input
-    .trim_matches(|c: char| c == '[' || c == ']')
-    .rsplit_once(',')
-    .unwrap();
-  ProtocolTypeInfo::Array(handle_int(parts.0), parts.1.parse::<u8>().unwrap())
+    // structure: [(<int>, <int>), <int>], remove only square brackets first to preserve for int
+    let parts = input
+        .trim_matches(|c: char| c == '[' || c == ']')
+        .rsplit_once(',')
+        .unwrap();
+    ProtocolTypeInfo::Array(handle_int(parts.0), parts.1.parse::<u8>().unwrap())
 }
 
 fn handle_optional(input: &str) -> ProtocolTypeInfo {
-  let optional = input.trim_matches(match_typeinfo_structure);
-  ProtocolTypeInfo::Optional(optional.parse::<u8>().unwrap())
+    let optional = input.trim_matches(match_typeinfo_structure);
+    ProtocolTypeInfo::Optional(optional.parse::<u8>().unwrap())
 }
 
 fn parse_choice(input: &str) -> (&str, u8) {
-  let mut choice_values = input.trim_matches(match_typeinfo_structure).split(',');
-  (
-    choice_values
-      .next()
-      .unwrap()
-      .trim_matches(|c: char| c == '\''),
-    choice_values.next().unwrap().parse::<u8>().unwrap(),
-  )
+    let mut choice_values = input.trim_matches(match_typeinfo_structure).split(',');
+    (
+        choice_values
+            .next()
+            .unwrap()
+            .trim_matches(|c: char| c == '\''),
+        choice_values.next().unwrap().parse::<u8>().unwrap(),
+    )
 }
 
 fn handle_choice(input: &str) -> ProtocolTypeInfo {
-  let raw_choice = input
-    .trim_matches(|c: char| c == '[' || c == ']' || c == '(')
-    .split_once("),")
-    .unwrap();
-  let int = handle_int(raw_choice.0);
+    let raw_choice = input
+        .trim_matches(|c: char| c == '[' || c == ']' || c == '(')
+        .split_once("),")
+        .unwrap();
+    let int = handle_int(raw_choice.0);
 
-  let mut choices = vec![];
-  let raw_choices = raw_choice
-    .1
-    .trim_matches(|c: char| c == '{' || c == '}')
-    .split_inclusive("),");
+    let mut choices = vec![];
+    let raw_choices = raw_choice
+        .1
+        .trim_matches(|c: char| c == '{' || c == '}')
+        .split_inclusive("),");
 
-  for choice in raw_choices {
-    let mut kv_pair = choice.split(':');
-    let key = kv_pair.next().unwrap().parse::<i64>().unwrap();
-    let value = kv_pair.next().unwrap();
-    choices.push((key, parse_choice(value)));
-  }
+    for choice in raw_choices {
+        let mut kv_pair = choice.split(':');
+        let key = kv_pair.next().unwrap().parse::<i64>().unwrap();
+        let value = kv_pair.next().unwrap();
+        choices.push((key, parse_choice(value)));
+    }
 
-  ProtocolTypeInfo::Choice(int, choices)
+    ProtocolTypeInfo::Choice(int, choices)
 }
 
 fn handle_struct(input: &str) -> ProtocolTypeInfo {
-  // only remove square brackets to preserve struct tuples
-  let struct_input = input
-    .trim_matches(|c: char| c == '[' || c == ']')
-    .split_inclusive("),");
+    // only remove square brackets to preserve struct tuples
+    let struct_input = input
+        .trim_matches(|c: char| c == '[' || c == ']')
+        .split_inclusive("),");
 
-  let mut structs = vec![];
-  for protocol_struct in struct_input {
-    let mut struct_values = protocol_struct
-      .trim_matches(match_typeinfo_structure)
-      .split(',');
-    structs.push(Struct(
-      struct_values
-        .next()
-        .unwrap()
-        .trim_matches(|c: char| c == '\''),
-      struct_values.next().unwrap().parse::<u8>().unwrap(),
-      struct_values.next().unwrap().parse::<i8>().unwrap(),
-    ));
-  }
+    let mut structs = vec![];
+    for protocol_struct in struct_input {
+        let mut struct_values = protocol_struct
+            .trim_matches(match_typeinfo_structure)
+            .split(',');
+        structs.push(Struct(
+            struct_values
+                .next()
+                .unwrap()
+                .trim_matches(|c: char| c == '\''),
+            struct_values.next().unwrap().parse::<u8>().unwrap(),
+            struct_values.next().unwrap().parse::<i8>().unwrap(),
+        ));
+    }
 
-  ProtocolTypeInfo::Struct(structs)
+    ProtocolTypeInfo::Struct(structs)
 }
 
 fn parse_typeinfos<'a>() -> Vec<ProtocolTypeInfo<'a>> {
-  let mut typeinfos: Vec<ProtocolTypeInfo> = vec![];
-  for protocol_type in RAW_TYPEINFOS.lines() {
-    let match_outer_structure =
-      |c: char| c == '(' || c == ')' || c == ',' || c == '#' || c == ' ' || c.is_numeric();
-    let formatted = protocol_type.trim_matches(match_outer_structure);
-    let (typename, typeinfo) = formatted.split_once(',').unwrap();
+    let mut typeinfos: Vec<ProtocolTypeInfo> = vec![];
+    for protocol_type in RAW_TYPEINFOS.lines() {
+        let match_outer_structure =
+            |c: char| c == '(' || c == ')' || c == ',' || c == '#' || c == ' ' || c.is_numeric();
+        let formatted = protocol_type.trim_matches(match_outer_structure);
+        let (typename, typeinfo) = formatted.split_once(',').unwrap();
 
-    // println!("typeinfo {:?}", typeinfo);
+        // println!("typeinfo {:?}", typeinfo);
 
-    let parsed = match typename.trim_matches(|c: char| c == '\'') {
-      "_int" => ProtocolTypeInfo::Int(handle_int(typeinfo)),
-      "_blob" => ProtocolTypeInfo::Blob(handle_int(typeinfo)),
-      "_bool" => ProtocolTypeInfo::Bool,
-      "_array" => handle_array(typeinfo),
-      "_null" => ProtocolTypeInfo::Null,
-      "_bitarray" => ProtocolTypeInfo::BitArray(handle_int(typeinfo)),
-      "_optional" => handle_optional(typeinfo),
-      "_fourcc" => ProtocolTypeInfo::FourCC,
-      "_choice" => handle_choice(typeinfo),
-      "_struct" => handle_struct(typeinfo),
-      _other => panic!("Found unknown typeinfo {:?}", _other),
-    };
-    // println!("parsed {:?}", parsed);
-    typeinfos.push(parsed);
-  }
+        let parsed = match typename.trim_matches(|c: char| c == '\'') {
+            "_int" => ProtocolTypeInfo::Int(handle_int(typeinfo)),
+            "_blob" => ProtocolTypeInfo::Blob(handle_int(typeinfo)),
+            "_bool" => ProtocolTypeInfo::Bool,
+            "_array" => handle_array(typeinfo),
+            "_null" => ProtocolTypeInfo::Null,
+            "_bitarray" => ProtocolTypeInfo::BitArray(handle_int(typeinfo)),
+            "_optional" => handle_optional(typeinfo),
+            "_fourcc" => ProtocolTypeInfo::FourCC,
+            "_choice" => handle_choice(typeinfo),
+            "_struct" => handle_struct(typeinfo),
+            _other => panic!("Found unknown typeinfo {:?}", _other),
+        };
+        // println!("parsed {:?}", parsed);
+        typeinfos.push(parsed);
+    }
 
-  typeinfos
+    typeinfos
 }
 
 const ALLOWED_EVENTS: [&str; 5] = [
-  "NNet.Replay.Tracker.SPlayerStatsEvent",
-  "NNet.Replay.Tracker.SUnitInitEvent",
-  "NNet.Replay.Tracker.SUnitBornEvent",
-  "NNet.Replay.Tracker.SUnitTypeChangeEvent",
-  "NNet.Replay.Tracker.SUnitDiedEvent",
+    "NNet.Replay.Tracker.SPlayerStatsEvent",
+    "NNet.Replay.Tracker.SUnitInitEvent",
+    "NNet.Replay.Tracker.SUnitBornEvent",
+    "NNet.Replay.Tracker.SUnitTypeChangeEvent",
+    "NNet.Replay.Tracker.SUnitDiedEvent",
 ];
 
 pub struct Protocol<'a> {
-  typeinfos: Vec<ProtocolTypeInfo<'a>>,
-  game_event_types: HashMap<i64, (u8, &'a str)>,
-  tracker_event_types: HashMap<i64, (u8, &'a str)>,
-  message_event_types: HashMap<i64, (u8, &'a str)>,
+    typeinfos: Vec<ProtocolTypeInfo<'a>>,
+    game_event_types: HashMap<i64, (u8, &'a str)>,
+    tracker_event_types: HashMap<i64, (u8, &'a str)>,
+    message_event_types: HashMap<i64, (u8, &'a str)>,
 }
 
 impl<'a> Protocol<'a> {
-  pub fn new() -> Protocol<'a> {
-    let typeinfos = parse_typeinfos();
-    let (game_event_types, tracker_event_types, message_event_types) =
-      instantiate_event_types();
+    pub fn new() -> Protocol<'a> {
+        let typeinfos = parse_typeinfos();
+        let (game_event_types, tracker_event_types, message_event_types) =
+            instantiate_event_types();
 
-    Protocol {
-      typeinfos,
-      game_event_types,
-      tracker_event_types,
-      message_event_types,
-    }
-  }
-
-  pub fn decode_replay_details(&self, contents: Vec<u8>) -> Vec<EventEntry> {
-    let mut decoder = VersionedDecoder::new(contents, &self.typeinfos);
-    let details = decoder.instance(&self.typeinfos, &GAME_DETAILS_TYPEID, true);
-
-    match details {
-      DecoderResult::Struct(values) => values,
-      _other => panic!("Found DecoderResult::{:?}", _other),
-    }
-  }
-
-  pub fn decode_replay_tracker_events(&self, contents: Vec<u8>) -> Vec<Event> {
-    let mut decoder = VersionedDecoder::new(contents, &self.typeinfos);
-    let mut gameloop = 0;
-    let mut events: Vec<Event> = vec![];
-
-    while !VersionedDecoder::done(&decoder.buffer) {
-      let start_bits = VersionedDecoder::used_bits(&decoder.buffer);
-
-      let delta = decoder.instance(&self.typeinfos, &SVARUINT32_TYPEID, true);
-      if let DecoderResult::Gameloop((_, v)) = delta {
-        gameloop += v;
-      } else {
-        panic!("found something else {:?}", delta);
-      }
-
-      let event_id = match decoder.instance(&self.typeinfos, &TRACKER_EVENTID_TYPEID, true) {
-        DecoderResult::Value(value) => value,
-        _other => panic!("event_id is not a value: {:?}", _other),
-      };
-
-      let (type_id, typename) = match self.tracker_event_types.get(&event_id) {
-        Some((type_id, typename)) => (type_id, typename),
-        None => panic!("CorruptedError: event_id({:?})", event_id),
-      };
-
-      let is_event_allowed = ALLOWED_EVENTS.contains(typename);
-      let decoded_event = decoder.instance(&self.typeinfos, type_id, is_event_allowed);
-      if is_event_allowed {
-        let event = match decoded_event {
-          DecoderResult::Struct(mut entries) => {
-            entries.push(("_gameloop".to_string(), DecoderResult::Value(gameloop)));
-            entries.push(("_event".to_string(), DecoderResult::Name(typename.to_string())));
-            Event::new(entries)
-          }
-          _other => panic!("Only supports Structs"),
-        };
-        events.push(event);
-      }
-
-      VersionedDecoder::byte_align(&mut decoder.buffer);
-    }
-
-    events
-  }
-
-  pub fn decode_replay_game_events(&self, contents: Vec<u8>) -> Vec<Event> {
-    let mut decoder = BitPackedDecoder::new(contents, &self.typeinfos);
-    let mut gameloop = 0;
-    let mut events: Vec<Event> = vec![];
-
-    while !BitPackedDecoder::done(&decoder.buffer) {
-      let start_bits = BitPackedDecoder::used_bits(&decoder.buffer);
-
-      let delta = decoder.instance(&self.typeinfos, &SVARUINT32_TYPEID, true);
-
-      let userid = decoder.instance(&self.typeinfos, &REPLAY_USERID_TYPEID, true);
-
-      let event_id = match decoder.instance(&self.typeinfos, &GAME_EVENTID_TYPEID, true) {
-        DecoderResult::Value(value) => value,
-        _other => panic!("event_id is not a value: {:?}", _other),
-      };
-
-      let (type_id, typename) = match self.game_event_types.get(&event_id) {
-        Some((type_id, typename)) => (type_id, typename),
-        None => panic!("CorruptedError: event_id({:?})", event_id),
-      };
-
-      let event = match decoder.instance(&self.typeinfos, type_id, true) {
-        DecoderResult::Struct(mut entries) => {
-          entries.push(("_event".to_string(), DecoderResult::Name(typename.to_string())));
-          Event::new(entries)
+        Protocol {
+            typeinfos,
+            game_event_types,
+            tracker_event_types,
+            message_event_types,
         }
-        _other => panic!("Only supports Structs"),
-      };
-      events.push(event);
-
-      BitPackedDecoder::byte_align(&mut decoder.buffer);
     }
 
-    events
-  }
+    pub fn decode_replay_details(&self, contents: Vec<u8>) -> Vec<EventEntry> {
+        let mut decoder = VersionedDecoder::new(contents, &self.typeinfos);
+        let details = decoder.instance(&self.typeinfos, &GAME_DETAILS_TYPEID, true);
+
+        match details {
+            DecoderResult::Struct(values) => values,
+            _other => panic!("Found DecoderResult::{:?}", _other),
+        }
+    }
+
+    pub fn decode_replay_tracker_events(&self, contents: Vec<u8>) -> Vec<Event> {
+        let mut decoder = VersionedDecoder::new(contents, &self.typeinfos);
+        let mut gameloop = 0;
+        let mut events: Vec<Event> = vec![];
+
+        while !VersionedDecoder::done(&decoder.buffer) {
+            let start_bits = VersionedDecoder::used_bits(&decoder.buffer);
+
+            let delta = decoder.instance(&self.typeinfos, &SVARUINT32_TYPEID, true);
+            if let DecoderResult::Gameloop((_, v)) = delta {
+                gameloop += v;
+            } else {
+                panic!("found something else {:?}", delta);
+            }
+
+            let event_id = match decoder.instance(&self.typeinfos, &TRACKER_EVENTID_TYPEID, true) {
+                DecoderResult::Value(value) => value,
+                _other => panic!("event_id is not a value: {:?}", _other),
+            };
+
+            let (type_id, typename) = match self.tracker_event_types.get(&event_id) {
+                Some((type_id, typename)) => (type_id, typename),
+                None => panic!("CorruptedError: event_id({:?})", event_id),
+            };
+
+            let is_event_allowed = ALLOWED_EVENTS.contains(typename);
+            let decoded_event = decoder.instance(&self.typeinfos, type_id, is_event_allowed);
+            if is_event_allowed {
+                let event = match decoded_event {
+                    DecoderResult::Struct(mut entries) => {
+                        entries.push(("_gameloop".to_string(), DecoderResult::Value(gameloop)));
+                        entries.push((
+                            "_event".to_string(),
+                            DecoderResult::Name(typename.to_string()),
+                        ));
+                        Event::new(entries)
+                    }
+                    _other => panic!("Only supports Structs"),
+                };
+                events.push(event);
+            }
+
+            VersionedDecoder::byte_align(&mut decoder.buffer);
+        }
+
+        events
+    }
+
+    pub fn decode_replay_game_events(&self, contents: Vec<u8>) -> Vec<Event> {
+        let mut decoder = BitPackedDecoder::new(contents, &self.typeinfos);
+        let mut gameloop = 0;
+        let mut events: Vec<Event> = vec![];
+
+        while !BitPackedDecoder::done(&decoder.buffer) {
+            let start_bits = BitPackedDecoder::used_bits(&decoder.buffer);
+
+            let delta = decoder.instance(&self.typeinfos, &SVARUINT32_TYPEID, true);
+
+            let userid = decoder.instance(&self.typeinfos, &REPLAY_USERID_TYPEID, true);
+
+            let event_id = match decoder.instance(&self.typeinfos, &GAME_EVENTID_TYPEID, true) {
+                DecoderResult::Value(value) => value,
+                _other => panic!("event_id is not a value: {:?}", _other),
+            };
+
+            let (type_id, typename) = match self.game_event_types.get(&event_id) {
+                Some((type_id, typename)) => (type_id, typename),
+                None => panic!("CorruptedError: event_id({:?})", event_id),
+            };
+
+            let event = match decoder.instance(&self.typeinfos, type_id, true) {
+                DecoderResult::Struct(mut entries) => {
+                    entries.push((
+                        "_event".to_string(),
+                        DecoderResult::Name(typename.to_string()),
+                    ));
+                    Event::new(entries)
+                }
+                _other => panic!("Only supports Structs"),
+            };
+            events.push(event);
+
+            BitPackedDecoder::byte_align(&mut decoder.buffer);
+        }
+
+        events
+    }
 }
