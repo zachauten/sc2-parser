@@ -61,8 +61,6 @@ pub struct TinybirdGame {
     map: String,
     game_length: u16,
     played_at: u128,
-    event: String,
-    // game_version: String,
 }
 
 #[derive(Default, Debug, Clone, Serialize)]
@@ -89,7 +87,6 @@ pub struct TinybirdTimelineEntry {
     // opponent_workers_killed: u16,
     matchup: String,
     map: String,
-    event: String,
     game_length: u16,
     played_at: u128,
     game_version: String,

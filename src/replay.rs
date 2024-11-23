@@ -46,7 +46,6 @@ pub struct Parsed {
     pub player_info: Vec<EventEntry>,
     pub tracker_events: Vec<Event>,
     pub metadata: String,
-    pub tags: String,
 }
 
 // #[wasm_bindgen(getter_with_clone)]
@@ -60,22 +59,20 @@ pub struct Replay {
 #[wasm_bindgen]
 impl Replay {
     #[wasm_bindgen(constructor)]
-    pub fn constructor(bytes: Vec<u8>, path: &str, tags: Vec<String>) -> JsValue {
-        let replay = Self::new(bytes, path, tags);
+    pub fn constructor(bytes: Vec<u8>, path: &str) -> JsValue {
+        let replay = Self::new(bytes, path);
         serde_wasm_bindgen::to_value(&replay).unwrap()
     }
 }
 
 impl Replay {
-    // TODO: generate content hash, it shouldn't need to be passed in.
-    // TODO: remove tags, that can be handled outside of replay parsing
-    pub fn new(bytes: Vec<u8>, path: &str, tags: Vec<String>) -> Replay {
+    pub fn new(bytes: Vec<u8>, path: &str) -> Replay {
         let content_hash = digest_bytes(&bytes);
         let cursor = Cursor::new(bytes);
         let reader = BufReader::new(cursor);
         let archive = MPQArchive::new(reader);
         let protocol: Protocol = Protocol::new();
-        let parsed = Replay::parse(archive, protocol, tags);
+        let parsed = Replay::parse(archive, protocol);
         Replay {
             file_path: path.to_string(),
             content_hash,
@@ -83,11 +80,7 @@ impl Replay {
         }
     }
 
-    fn parse<T: Seek + Read>(
-        mut archive: MPQArchive<T>,
-        protocol: Protocol,
-        tags: Vec<String>,
-    ) -> Parsed {
+    fn parse<T: Seek + Read>(mut archive: MPQArchive<T>, protocol: Protocol) -> Parsed {
         let contents = archive.read_file("replay.tracker.events").unwrap();
         let raw_metadata = archive.read_file("replay.gamemetadata.json").unwrap();
         let metadata = String::from_utf8(raw_metadata.clone()).unwrap();
@@ -98,7 +91,6 @@ impl Replay {
             player_info,
             tracker_events,
             metadata,
-            tags: tags.join(","),
         }
     }
 }

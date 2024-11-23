@@ -30,7 +30,6 @@ pub struct ReplaySummary {
     pub game_length: u16,
     pub map: String,
     pub played_at: u128,
-    pub tags: String,
     pub tinybird: TinybirdGame,
     pub timeline: Vec<TinybirdTimelineEntry>,
 }
@@ -43,7 +42,6 @@ pub struct TimelineContext {
     pub workers_killed: [u16; 2],
     pub winner_id: u8,
     pub map: String,
-    pub event: String,
     pub matchup: String,
     pub game_length: u16,
     pub played_at: u128,
@@ -127,7 +125,6 @@ impl<'a> ReplayParser<'a> {
         // units: &mut Vec<String>,
     ) -> Result<ReplaySummary, &'static str> {
         let replay = raw_replay.parsed;
-        let tags = replay.tags.clone();
 
         let parsed_metadata: Metadata = serde_json::from_str(&replay.metadata).unwrap();
 
@@ -256,7 +253,6 @@ impl<'a> ReplayParser<'a> {
             winner_id: winner,
             matchup: serialized_matchup.join(""),
             map: map.to_owned(),
-            event: tags.clone(),
             game_length,
             played_at,
             game_version: parsed_metadata.GameVersion.to_string(),
@@ -323,7 +319,6 @@ impl<'a> ReplayParser<'a> {
             map: map.to_owned(),
             game_length,
             played_at,
-            event: replay.tags.clone(),
             // game_version: parsed_metadata.GameVersion.to_string(),
         };
 
@@ -337,7 +332,6 @@ impl<'a> ReplayParser<'a> {
             game_length,
             map: map.to_owned(),
             played_at,
-            tags: tags.clone(),
             tinybird: tinybird_game,
             timeline: self.timeline.clone(),
         };

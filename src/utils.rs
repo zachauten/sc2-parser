@@ -8,19 +8,6 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 
 pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
-    const VALID_TAGS: [&str; 10] = [
-        "ASUS ROG",
-        "DreamHack Masters",
-        "HomeStory Cup",
-        "IEM Katowice",
-        "TSL",
-        "Wardi",
-        "OlimoLeague",
-        "AlphaX",
-        "WESG",
-        "WCS",
-    ];
-
     if dir.is_dir() {
         for entry in read_dir(dir)? {
             let entry = entry?;
@@ -34,19 +21,12 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                 Some(extension) => {
                     if extension == "SC2Replay" {
                         let current_path = path.to_str().unwrap();
-                        let mut tags = vec![];
-
-                        for tag in VALID_TAGS {
-                            if current_path.contains(tag) {
-                                tags.push(tag.to_string());
-                            }
-                        }
 
                         let path_str = path.to_str().unwrap();
                         println!("parsing replay {:?}", path_str);
                         let bytes = std::fs::read(path_str).expect("Failed to read replay file");
 
-                        let replay = Replay::new(bytes, path_str, tags);
+                        let replay = Replay::new(bytes, path_str);
                         let raw_played_at = &replay
                             .parsed
                             .player_info
