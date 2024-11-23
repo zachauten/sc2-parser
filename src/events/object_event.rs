@@ -3,8 +3,6 @@ use crate::game::{Game, GameObject};
 use crate::parser::TimelineContext;
 use crate::replay::Event;
 
-use std::collections::hash_map::Entry;
-use std::collections::HashSet;
 
 const UNITS: [&str; 47] = [
     // Protoss
@@ -164,7 +162,7 @@ impl ObjectEvent {
     ) -> Result<(), &'static str> {
         let mut player_id: u8 = 0;
         let mut event_object_name = "";
-        let mut event_object_type = ObjectType::Building;
+        let event_object_type = ObjectType::Building;
         let mut tag_index = 0;
         let mut tag_recycle = 0;
         let mut current_gameloop = 0;
@@ -230,7 +228,7 @@ impl ObjectEvent {
 
         // if !game.objects.contains_key(&tag_index) {
         // if let None = game.objects.iter().find(|obj| obj.tag_index == tag_index) {
-        let mut game_object = match game
+        let game_object = match game
             .objects
             .binary_search_by(|obj| obj.tag_index.cmp(&tag_index))
         {

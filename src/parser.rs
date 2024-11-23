@@ -7,7 +7,6 @@ use crate::game::Game;
 use crate::replay::{Event, Metadata, Replay};
 use crate::{Player, TinybirdGame, TinybirdTimelineEntry};
 use std::collections::HashMap;
-use wasm_bindgen::prelude::*;
 
 pub type RaceMappings<'a> = HashMap<&'a str, &'a str>;
 

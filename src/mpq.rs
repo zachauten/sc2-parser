@@ -1,16 +1,13 @@
 use std::collections::HashMap;
-use std::fs::File;
 use std::io::copy;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::io::SeekFrom;
-use std::path::PathBuf;
 
 // use bzip2::Decompress;
 // use bzip2_rs::decoder::Decoder;
 use bzip2_rs::DecoderReader;
 
-use wasm_bindgen::prelude::*;
 
 const MPQ_FILE_IMPLODE: u32 = 0x00000100;
 const MPQ_FILE_COMPRESS: u32 = 0x00000200;
@@ -396,8 +393,8 @@ impl<T: Seek + Read> MPQArchive<T> {
             // file has many sectors that need to be separately decompressed
             if block_entry.flags & MPQ_FILE_SINGLE_UNIT == 0 {
                 panic!("Not implemented yet");
-            } else if (block_entry.flags & MPQ_FILE_COMPRESS != 0
-                && (force_decompress || block_entry.size > block_entry.archived_size))
+            } else if block_entry.flags & MPQ_FILE_COMPRESS != 0
+                && (force_decompress || block_entry.size > block_entry.archived_size)
             {
                 file_data = MPQArchive::<T>::decompress(file_data);
             }

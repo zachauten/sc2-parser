@@ -1,6 +1,5 @@
 use std::cmp::min;
 use std::mem::swap;
-use std::time::Instant;
 
 use serde::Serialize;
 

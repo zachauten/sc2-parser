@@ -15,7 +15,7 @@ impl PlayerStatsEvent {
     ) -> Result<(), &'static str> {
         let mut player_id: u8 = 0;
         let mut gameloop: u16 = 0;
-        let mut timeline_entry: TinybirdTimelineEntry = Default::default();
+        let timeline_entry: TinybirdTimelineEntry = Default::default();
 
         for (field, value) in &event.entries {
             match field.as_str() {

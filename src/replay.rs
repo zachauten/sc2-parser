@@ -1,7 +1,6 @@
 use crate::decoders::{DecoderResult, EventEntry};
 use crate::mpq::MPQArchive;
 use crate::protocol::Protocol;
-use crate::utils;
 
 use serde::{Deserialize, Serialize};
 

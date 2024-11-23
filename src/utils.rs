@@ -1,7 +1,7 @@
 use crate::decoders::DecoderResult;
 use crate::replay::Replay;
 
-use std::fs::{copy, read_dir};
+use std::fs::read_dir;
 use std::io::Result;
 use std::path::Path;
 

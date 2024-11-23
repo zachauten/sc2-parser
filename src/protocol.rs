@@ -647,7 +647,7 @@ impl<'a> Protocol<'a> {
 
     pub fn decode_replay_game_events(&self, contents: Vec<u8>) -> Vec<Event> {
         let mut decoder = BitPackedDecoder::new(contents, &self.typeinfos);
-        let mut gameloop = 0;
+        let gameloop = 0;
         let mut events: Vec<Event> = vec![];
 
         while !BitPackedDecoder::done(&decoder.buffer) {
