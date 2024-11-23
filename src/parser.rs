@@ -115,18 +115,7 @@ impl<'a> ReplayParser<'a> {
                     }
                     _other => (),
                 }
-
-                // // 672 gameloops = ~30sec
-                // if self.state.gameloop % 672 == 0 {
-                //   let serialized_state = serde_json::to_string(&self.state).unwrap();
-                //   self.timeline.push(serialized_state);
-                // }
-
-                // Ok(())
             }
-            // else {
-            //   Err("Found event without name")
-            // }
         }
 
         Ok(())
@@ -303,26 +292,6 @@ impl<'a> ReplayParser<'a> {
                 }
             }
         }
-
-        // let mut replay_units_mappings: [u16; 2] = [0, 0];
-        // let mut replay_units: [Vec<String>; 2] = [vec![], vec![]];
-        // for (replay_unit_index, unit) in game.units.iter_mut().enumerate() {
-        //   unit.sort_by(|a, b| a.1.cmp(&b.1));
-        //   replay_units[replay_unit_index] = unit
-        //     .iter()
-        //     .map(|(unit, _)| unit.to_owned())
-        //     .collect::<Vec<String>>();
-
-        //   let joined_units = replay_units[replay_unit_index].join(",");
-        //   match units.iter().position(|seen_units| &joined_units == seen_units) {
-        //     Some(unit_index) => replay_units_mappings[replay_unit_index] = unit_index as u16,
-        //     None => {
-        //       units.push(joined_units);
-        //       replay_units_mappings[replay_unit_index] = units.len() as u16 - 1;
-        //     }
-        //   }
-        // }
-
         const GAS_BUILDINGS: [&str; 3] = ["Assimilator", "Refinery", "Extractor"];
 
         let winner_build = replay_builds[(winner - 1) as usize]

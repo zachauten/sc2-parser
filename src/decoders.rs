@@ -339,22 +339,6 @@ impl Decoder for BitPackedDecoder<'_> {
     fn _struct<'a>(&mut self, fields: &[Struct], event_allowed: bool) -> DecoderResult {
         let mut result = Vec::with_capacity(fields.len());
         for field in fields {
-            // appears that this isn't needed since field is never parent
-            // match fields.into_iter().find(|f| f.2 as i128 == tag) {
-            //   Some(field) => {
-            //   if field.0 == "__parent" {
-            //     let parent = self.instance(self.typeinfos, field.1);
-            //   } else {
-            // let field_value = match self.instance(self.typeinfos, field.1) {
-            //   DecoderResult::Value(value) => value,
-            //   _other => panic!("field.1 is not a value: {:?}", field),
-            // };
-            // result.insert(field.0.as_str(), field_value as u8);
-            //   }
-            //   },
-            //   None => self._skip_instance(),
-            // };
-
             // field always seems to exist?
             let field_value = self.instance(self.typeinfos, &field.1, event_allowed);
             match event_allowed {
@@ -552,22 +536,6 @@ impl Decoder for VersionedDecoder<'_> {
         let length = self._vint();
         for _ in 0..length {
             let tag = self._vint();
-
-            // appears that this isn't needed since field is never parent
-            // match fields.into_iter().find(|f| f.2 as i128 == tag) {
-            //   Some(field) => {
-            //   if field.0 == "__parent" {
-            //     let parent = self.instance(self.typeinfos, field.1);
-            //   } else {
-            // let field_value = match self.instance(self.typeinfos, field.1) {
-            //   DecoderResult::Value(value) => value,
-            //   _other => panic!("field.1 is not a value: {:?}", field),
-            // };
-            // result.insert(field.0.as_str(), field_value as u8);
-            //   }
-            //   },
-            //   None => self._skip_instance(),
-            // };
 
             // field always seems to exist?
             let field = fields.iter().find(|f| f.2 as i128 == tag).unwrap();

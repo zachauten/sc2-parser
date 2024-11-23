@@ -102,22 +102,6 @@ impl PlayerStatsEvent {
                                         event_gas_collected += gas;
                                     }
                                 }
-                                // "m_scoreValueMineralsUsedInProgressArmy" |
-                                // "m_scoreValueMineralsUsedInProgressEconomy" |
-                                // "m_scoreValueMineralsUsedInProgressTechnology" |
-                                // "m_scoreValueMineralsUsedCurrentArmy" |
-                                // "m_scoreValueMineralsUsedCurrentEconomy" |
-                                // "m_scoreValueMineralsUsedCurrentTechnology" => if let DecoderResult::Value(minerals) = value {
-                                //   event_minerals_collected += minerals;
-                                // },
-                                // "m_scoreValueVespeneUsedInProgressArmy" |
-                                // "m_scoreValueVespeneUsedInProgressEconomy" |
-                                // "m_scoreValueVespeneUsedInProgressTechnology" |
-                                // "m_scoreValueVespeneUsedCurrentArmy" |
-                                // "m_scoreValueVespeneUsedCurrentEconomy" |
-                                // "m_scoreValueVespeneUsedCurrentTechnology" => if let DecoderResult::Value(gas) = value {
-                                //   event_gas_collected += gas;
-                                // },
                                 "m_scoreValueMineralsUsedInProgressArmy"
                                 | "m_scoreValueMineralsUsedCurrentArmy" => {
                                     if let DecoderResult::Value(minerals) = value {
@@ -148,28 +132,6 @@ impl PlayerStatsEvent {
                         ));
 
                         let win = if context.winner_id == player_id { 1 } else { 0 };
-
-                        // let timeline_state: TinybirdTimelineEntry = TinybirdTimelineEntry {
-                        //   content_hash: context.content_hash.clone(),
-                        //   win,
-                        //   player: context.players[player_index].name.clone(),
-                        //   player_race: context.players[player_index].race.clone(),
-                        //   // player_build: context.players[player_index].build,
-                        //   player_collection_rate: event_minerals_collection_rate + event_gas_collection_rate,
-                        //   player_army_value: event_minerals_army_value + event_gas_army_value,
-                        //   player_workers_active: game.workers_active[player_index] as u16,
-                        //   // player_workers_lost: (),
-                        //   // player_workers_killed: (),
-                        //   matchup: context.matchup.clone(),
-                        //   map: context.map.clone(),
-                        //   event: context.event.clone(),
-                        //   game_length: context.game_length,
-                        //   played_at: context.played_at,
-                        //   game_version: context.game_version.clone(),
-                        //   ..Default::default()
-                        // };
-
-                        // timeline_entry = timeline_state;
                     } else {
                         panic!("didn't find struct {:?}", value);
                     }
@@ -177,28 +139,6 @@ impl PlayerStatsEvent {
                 _other => continue,
             }
         }
-
-        // // event might be encountered before gameloop
-        // timeline_entry.gameloop = gameloop;
-
-        // if let Some(previous_timeline_entry) = timeline.last_mut() {
-        //   if previous_timeline_entry.gameloop == gameloop {
-        //     timeline_entry.opponent = previous_timeline_entry.player.clone();
-        //     timeline_entry.opponent_race = previous_timeline_entry.player_race.clone();
-        //     timeline_entry.opponent_collection_rate = previous_timeline_entry.player_collection_rate.clone();
-        //     timeline_entry.opponent_army_value = previous_timeline_entry.player_army_value.clone();
-        //     timeline_entry.opponent_workers_active = previous_timeline_entry.player_workers_active.clone();
-
-        //     previous_timeline_entry.opponent = timeline_entry.player.clone();
-        //     previous_timeline_entry.opponent_race = timeline_entry.player_race.clone();
-        //     previous_timeline_entry.opponent_collection_rate = timeline_entry.player_collection_rate.clone();
-        //     previous_timeline_entry.opponent_army_value = timeline_entry.player_army_value.clone();
-        //     previous_timeline_entry.opponent_workers_active = timeline_entry.player_workers_active.clone();
-        //   }
-        // }
-
-        // timeline.push(timeline_entry);
-
         Ok(())
     }
 }

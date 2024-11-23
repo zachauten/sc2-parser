@@ -92,36 +92,12 @@ impl Replay {
         protocol: Protocol,
         tags: Vec<String>,
     ) -> Parsed {
-        // let header_content = &self.archive
-        //   .header
-        //   .user_data_header
-        //   .as_ref()
-        //   .expect("No user data header")
-        //   .content;
-        // // println!("read header {:.2?}", now.elapsed());
-
         let contents = archive.read_file("replay.tracker.events").unwrap();
-        // println!("read tracker events {:.2?}", now.elapsed());
-
-        // let game_info = self.archive.read_file("replay.game.events").unwrap();
-        // // println!("read game events {:.2?}", now.elapsed());
-
-        // let init_data = self.archive.read_file("replay.initData").unwrap();
-        // // println!("read details {:.2?}", now.elapsed());
-
         let raw_metadata = archive.read_file("replay.gamemetadata.json").unwrap();
         let metadata = String::from_utf8(raw_metadata.clone()).unwrap();
-        // println!("read metadata {:.2?}", now.elapsed());
-
         let details = archive.read_file("replay.details").unwrap();
         let player_info = protocol.decode_replay_details(details);
-
         let tracker_events = protocol.decode_replay_tracker_events(contents);
-        // println!("decoded replay tracker events {:.2?}", now.elapsed());
-
-        // let game_events = self.protocol.decode_replay_game_events(game_info);
-        // // println!("decoding replay game events {:.2?}", now.elapsed());
-
         Parsed {
             player_info,
             tracker_events,
@@ -129,11 +105,4 @@ impl Replay {
             tags: tags.join(","),
         }
     }
-
-    // // function that doesn't parse replay events for speed
-    // // can return high level information about game like
-    // // date, matchup, MMR, etc to decide whether to skip parsing
-    // pub fn peek() {
-
-    // }
 }

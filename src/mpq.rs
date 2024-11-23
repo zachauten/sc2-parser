@@ -396,22 +396,6 @@ impl<T: Seek + Read> MPQArchive<T> {
             // file has many sectors that need to be separately decompressed
             if block_entry.flags & MPQ_FILE_SINGLE_UNIT == 0 {
                 panic!("Not implemented yet");
-                // let sector_size = 512 << header.sector_size_shift;
-                // let mut sectors = block_entry.size / sector_size + 1;
-
-                // let mut crc = false;
-                // if block_entry.flags & MPQ_FILE_SECTOR_CRC != 0 {
-                //   crc = true;
-                //   sectors += 1;
-                // }
-
-                // let positions = file_data[..4 * (sectors + 1)];
-                // let mut result = vec![];
-                // let mut sector_bytes_left = block_entry.size;
-
-                // for i in 0..(positions.len() - (crc ? 2 : 1)) {
-                //   let sector = file_data[positions[i]..positions[i + 1]]
-                // }
             } else if (block_entry.flags & MPQ_FILE_COMPRESS != 0
                 && (force_decompress || block_entry.size > block_entry.archived_size))
             {
@@ -490,12 +474,6 @@ impl<T: Seek + Read> MPQArchive<T> {
         } else if compression_type == 2 {
             panic!("zlib compression not implemented yet");
         } else if compression_type == 16 {
-            // let mut decompressor = Decompress::new(false);
-            // decompressor.decompress_vec(&mut &data[1..], &mut decompressed_data).unwrap();
-
-            // let mut reader = ParallelDecoderReader::new(Cursor::new(data), RayonThreadPool, usize::max_value());
-            // copy(&mut reader, output);
-
             let mut decompressed_data = vec![];
             let mut reader = DecoderReader::new(&data[1..]);
             copy(&mut reader, &mut decompressed_data);
