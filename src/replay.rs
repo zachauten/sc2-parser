@@ -1,6 +1,7 @@
 use crate::decoders::{DecoderResult, EventEntry};
 use crate::mpq::MPQArchive;
 use crate::protocol::Protocol;
+use crate::utils;
 
 use serde::{Deserialize, Serialize};
 
@@ -52,18 +53,24 @@ pub struct Parsed {
 // #[wasm_bindgen(getter_with_clone)]
 #[derive(Serialize, Deserialize)]
 pub struct Replay {
-  pub file_path: String,
-  pub content_hash: String,
-  pub parsed: Parsed,
+    pub file_path: String,
+    pub content_hash: String,
+    pub parsed: Parsed,
 }
 
 #[wasm_bindgen]
 impl Replay {
-  #[wasm_bindgen(constructor)]
-  pub fn constructor(bytes: Vec<u8>, path: &str, content_hash: String, tags: Vec<String>) -> JsValue {
-    let replay = Self::new(bytes, path, content_hash, tags);
-    serde_wasm_bindgen::to_value(&replay).unwrap()
-  }
+    #[wasm_bindgen(constructor)]
+    pub fn constructor(
+        bytes: Vec<u8>,
+        path: &str,
+        content_hash: String,
+        tags: Vec<String>,
+    ) -> JsValue {
+        set_panic_hook();
+        let replay = Self::new(bytes, path, content_hash, tags);
+        serde_wasm_bindgen::to_value(&replay).unwrap()
+    }
 }
 
 impl Replay {
@@ -133,4 +140,15 @@ impl Replay {
     // pub fn peek() {
 
     // }
+}
+
+fn set_panic_hook() {
+    // When the `console_error_panic_hook` feature is enabled, we can call the
+    // `set_panic_hook` function at least once during initialization, and then
+    // we will get better error messages if our code ever panics.
+    //
+    // For more details see
+    // https://github.com/rustwasm/console_error_panic_hook#readme
+    #[cfg(feature = "console_error_panic_hook")]
+    console_error_panic_hook::set_once();
 }

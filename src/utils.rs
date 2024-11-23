@@ -61,7 +61,7 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                         let path_str = path.to_str().unwrap();
                         println!("parsing replay {:?}", path_str);
                         let bytes = std::fs::read(path_str).expect("Failed to read replay file");
-                
+
                         let replay = Replay::new(bytes, path_str, content_hash, tags);
                         let raw_played_at = &replay
                             .parsed

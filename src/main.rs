@@ -21,6 +21,7 @@ use std::fs::File;
 use std::path::Path;
 
 use std::time::Instant;
+use wasm_bindgen::prelude::*;
 
 #[derive(Serialize)]
 #[serde(untagged)]
@@ -258,4 +259,9 @@ fn main() {
     // wtr.flush().unwrap();
 
     println!("replays serialized in {:?}", now.elapsed());
+}
+
+#[wasm_bindgen]
+pub fn test() -> String {
+    return "Hello world!".to_string();
 }
