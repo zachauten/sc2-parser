@@ -56,7 +56,7 @@ impl BitPackedBuffer {
         let data = &self.data[self.used..self.used + bytes];
         self.used += bytes;
 
-        if data.len() != bytes as usize {
+        if data.len() != bytes {
             panic!("TruncatedError");
         }
 
@@ -96,7 +96,7 @@ impl BitPackedBuffer {
             let shifted_next: u8 = (self.next as u16 >> copybits) as u8;
             self.next = shifted_next;
             self.nextbits -= copybits as usize;
-            resultbits += copybits as u8;
+            resultbits += copybits;
         }
 
         result
@@ -165,8 +165,8 @@ pub enum DecoderResult {
 }
 
 pub trait Decoder {
-    fn instance<'a>(
-        &'a mut self,
+    fn instance(
+        &mut self,
         typeinfos: &[ProtocolTypeInfo],
         typeid: &u8,
         event_allowed: bool,
@@ -227,7 +227,7 @@ pub trait Decoder {
         event_allowed: bool,
     ) -> DecoderResult;
 
-    fn _struct<'a>(&'a mut self, fields: &[Struct], event_allowed: bool) -> DecoderResult;
+    fn _struct(&mut self, fields: &[Struct], event_allowed: bool) -> DecoderResult;
 }
 
 impl<'a> BitPackedDecoder<'a> {

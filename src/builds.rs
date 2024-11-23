@@ -61,11 +61,7 @@ impl Builds {
     }
 
     pub fn generate_tokens(&mut self, build: &Vec<String>, win: bool, token_prefix: String) {
-        let filtered_build: Vec<String> = build
-            .iter()
-            // .filter(|building| !FILTER_BUILDINGS.contains(&building.as_str()))
-            .map(|building| building.clone())
-            .collect();
+        let filtered_build: Vec<String> = build.to_vec();
 
         self.builds
             .entry(format!(
@@ -213,12 +209,12 @@ impl Builds {
         self.build_token_paths.clear();
     }
 
-    fn generate_next_path<'path>(
+    fn generate_next_path(
         &mut self,
         current_path: String,
         current_path_length: usize,
         path_probability: f32,
-        build: &'path Vec<String>,
+        build: &Vec<String>,
         build_prefix: &str,
         build_index: usize,
     ) {
@@ -251,7 +247,7 @@ impl Builds {
                 next_token = &tokens[tokens.len() - 1];
             }
 
-            let mut next_path_probability = path_probability.clone();
+            let mut next_path_probability = path_probability;
             let identifier_token = format!(
                 "{build_prefix}{SECTION_SEPARATOR}{current_token}{SECTION_SEPARATOR}{next_token}"
             );
@@ -267,7 +263,7 @@ impl Builds {
             {
                 next_path_probability *= token_sequence_probability;
             } else {
-                let mut token_sequence_probability = path_probability.clone();
+                let mut token_sequence_probability = path_probability;
                 let mut token_fragment_window = tokens.len();
 
                 // generate fragments of the current token backwards from the full token
@@ -317,7 +313,7 @@ impl Builds {
             }
 
             let mut next_path = current_path.clone();
-            if next_path != "" {
+            if !next_path.is_empty() {
                 next_path.push(TOKEN_SEPARATOR);
             }
             next_path.push_str(tokens.join(BUILDING_SEPARATOR).as_str());
@@ -435,9 +431,8 @@ impl Builds {
             vec![(0, build.len() as u8, 0, other_build.len() as u8)];
         let mut matching_blocks = vec![];
 
-        while queue.len() != 0 {
-            let (build_low_index, build_high_index, other_build_low_index, other_build_high_index) =
-                queue.pop().unwrap();
+        while let Some((build_low_index, build_high_index, other_build_low_index, other_build_high_index)) = queue.pop() {
+            
 
             let longest_match = Builds::find_longest_match(
                 build,
@@ -517,8 +512,8 @@ impl Builds {
 
     pub fn compare_builds(&mut self) {
         let mut missing_buildings: HashMap<String, u8> = HashMap::new();
-        for (joined_build, _) in &self.builds {
-            for (joined_other_build, _) in &self.builds {
+        for joined_build in self.builds.keys() {
+            for joined_other_build in self.builds.keys() {
                 // skip when we encounter the same game
                 if joined_build == joined_other_build {
                     continue;
@@ -643,7 +638,7 @@ impl Builds {
     }
 
     pub fn generate_clusters(&mut self) {
-        for (build_comparison, _) in &self.build_comparison_information {
+        for build_comparison in self.build_comparison_information.keys() {
             let comparison_builds: Vec<&str> = build_comparison.split(BUILD_SEPARATOR).collect();
 
             if !self.build_clusters.contains_key(comparison_builds[0]) {
@@ -696,8 +691,8 @@ impl Builds {
 
         loop {
             let mut seen_clusters: HashSet<&String> = HashSet::new();
-            for (cluster, _) in &self.build_clusters {
-                for (other_cluster, _) in &self.build_clusters {
+            for cluster in self.build_clusters.keys() {
+                for other_cluster in self.build_clusters.keys() {
                     let cluster_comparison_identifier =
                         format!("{cluster}{BUILD_SEPARATOR}{other_cluster}");
 
@@ -836,7 +831,7 @@ impl Builds {
             if completed {
                 let mut builds: Vec<Cluster> = vec![];
 
-                for (_, cluster) in &mut self.build_clusters {
+                for cluster in self.build_clusters.values_mut() {
                     builds.push(cluster.clone());
 
                     cluster.cluster.sort_by(|a, b| {

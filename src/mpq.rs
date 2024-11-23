@@ -135,7 +135,7 @@ impl<T: Seek + Read> MPQArchive<T> {
     fn read_header(file: &mut BufReader<T>) -> MPQFileHeader {
         let mut magic = [0; 4];
         file.read_exact(&mut magic).unwrap();
-        file.seek(SeekFrom::Start(0));
+        file.rewind();
 
         match magic {
             MPQ_MAGIC_A => MPQArchive::read_mpq_header(magic, file, None),
@@ -350,7 +350,7 @@ impl<T: Seek + Read> MPQArchive<T> {
         let mut result = vec![];
 
         for i in 0..(data.len() / 4) {
-            seed2 += table[&(0x400 + (seed1 & 0xFF))] as u128;
+            seed2 += table[&(0x400 + (seed1 & 0xFF))];
             seed2 &= 0xFFFFFFFF;
 
             let position = i * 4;
@@ -383,7 +383,7 @@ impl<T: Seek + Read> MPQArchive<T> {
             let offset = block_entry.offset + header.offset;
             file.seek(SeekFrom::Start(offset as u64));
 
-            let mut file_data = vec![0; block_entry.archived_size as usize];
+            let mut file_data = vec![0; block_entry.archived_size];
             file.read_exact(&mut file_data).unwrap();
 
             if block_entry.flags & MPQ_FILE_ENCRYPTED != 0 {

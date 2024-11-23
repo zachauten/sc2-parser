@@ -73,7 +73,7 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                         let mut played_at = 0;
                         if let DecoderResult::Value(value) = raw_played_at {
                             // TODO: this truncation is not working properly
-                            played_at = value.clone() as u128;
+                            played_at = *value as u128;
                         }
                         // game records time in window epoch for some reason
                         // https://en.wikipedia.org/wiki/Epoch_(computing)
@@ -87,7 +87,7 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                         // 1st Jan 2020 1577836800
                         // 1st Jan 2019 1546300800
                         // 1st Jan 2018 1514764800
-                        if played_at >= 1640995200 && played_at < 1672531200 {
+                        if (1640995200..1672531200).contains(&played_at) {
                             replays.push(replay);
                         }
                     }

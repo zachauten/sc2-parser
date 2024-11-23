@@ -210,19 +210,15 @@ impl ObjectEvent {
         }
 
         if event_name == "NNet.Replay.Tracker.SUnitDiedEvent" {
-            match game
+            if let Ok(idx) = game
                 .objects
-                .binary_search_by(|obj| obj.tag_index.cmp(&tag_index))
-            {
-                Ok(idx) => {
-                    game.objects.remove(idx);
-                    ()
-                }
-                Err(_) => (),
+                .binary_search_by(|obj| obj.tag_index.cmp(&tag_index)) {
+                game.objects.remove(idx);
+                
             }
         }
 
-        if event_object_name == "" {
+        if event_object_name.is_empty() {
             return Err("Object name not found");
         }
 

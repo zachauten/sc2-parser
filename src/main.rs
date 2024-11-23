@@ -145,7 +145,7 @@ fn main() {
     }
 
     for replay_summary in result.replays {
-        if &replay_summary.tinybird.winner_build != "" && &replay_summary.tinybird.loser_build != ""
+        if !replay_summary.tinybird.winner_build.is_empty() && !replay_summary.tinybird.loser_build.is_empty()
         {
             tinybird_serialized.push(replay_summary.tinybird.clone());
         }
@@ -265,5 +265,5 @@ fn main() {
 #[wasm_bindgen]
 pub fn test() -> String {
     console_error_panic_hook::set_once();
-    return "Hello world!".to_string();
+    "Hello world!".to_string()
 }

@@ -170,7 +170,7 @@ impl<'a> ReplayParser<'a> {
         let mut played_at = 0;
         if let DecoderResult::Value(value) = raw_played_at {
             // TODO: this truncation is not working properly
-            played_at = value.clone() as u128;
+            played_at = *value as u128;
         }
         // game records time in window epoch for some reason
         // https://en.wikipedia.org/wiki/Epoch_(computing)
@@ -269,7 +269,7 @@ impl<'a> ReplayParser<'a> {
         let mut replay_build_mappings: [u16; 2] = [0, 0];
         let mut replay_builds: [Vec<String>; 2] = [vec![], vec![]];
         for (replay_build_index, build) in self.game.builds.iter_mut().enumerate() {
-            if build.len() == 0 {
+            if build.is_empty() {
                 return Err("build is length 0");
             }
 

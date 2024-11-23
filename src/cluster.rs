@@ -117,8 +117,8 @@ impl Node {
         let mut inserted = false;
         for child in &mut self.children {
             if child.label == build_fragment {
-                child.value.add(&count);
-                self.value.add(&count);
+                child.value.add(count);
+                self.value.add(count);
 
                 inserted = true;
                 break;
@@ -133,14 +133,14 @@ impl Node {
             if compare_fragment == child.label {
                 let next_fragment = &build_fragment[child.label.len() + 1..];
 
-                if child.children.len() != 0 {
-                    child.walk(&next_fragment, count);
+                if !child.children.is_empty() {
+                    child.walk(next_fragment, count);
                 } else {
                     let new_node = Node::new(next_fragment.to_string(), count.clone());
                     child.children.push(new_node);
-                    child.value.add(&count);
+                    child.value.add(count);
                 }
-                self.value.add(&count);
+                self.value.add(count);
 
                 inserted = true;
                 break;
@@ -148,14 +148,14 @@ impl Node {
 
             if child.label.starts_with(compare_fragment) {
                 child.split_at(compare_fragment.len());
-                child.value.add(&count);
-                self.value.add(&count);
+                child.value.add(count);
+                self.value.add(count);
 
                 inserted = true;
                 break;
             }
 
-            let match_length = child.match_key(&build_fragment);
+            let match_length = child.match_key(build_fragment);
             if match_length == 0 {
                 continue;
             }
@@ -166,8 +166,8 @@ impl Node {
                 let remaining_fragment = build_fragment[match_length + 1..].to_string();
                 let new_node = Node::new(remaining_fragment, count.clone());
                 child.children.push(new_node);
-                child.value.add(&count);
-                self.value.add(&count);
+                child.value.add(count);
+                self.value.add(count);
 
                 inserted = true;
                 break;
@@ -181,7 +181,7 @@ impl Node {
         if !inserted {
             let new_node = Node::new(build_fragment.to_string(), count.clone());
             self.children.push(new_node);
-            self.value.add(&count);
+            self.value.add(count);
         }
     }
 }
