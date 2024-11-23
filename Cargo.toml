@@ -23,10 +23,5 @@ lto = "fat"
 codegen-units = 1
 opt-level = 3
 
-# [[bin]]
-# name = "sc2-parser"
-# path = "src/main.rs"
-
 [lib]
-path = "src/main.rs"
 crate-type = ["cdylib"]

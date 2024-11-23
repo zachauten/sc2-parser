@@ -5,7 +5,6 @@ use std::fs::read_dir;
 use std::io::Result;
 use std::path::Path;
 
-
 pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
     if dir.is_dir() {
         for entry in read_dir(dir)? {
