@@ -44,7 +44,7 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
 
                         for tag in VALID_TAGS {
                             if current_path.contains(tag) {
-                                tags.push(tag);
+                                tags.push(tag.to_string());
                             }
                         }
 
@@ -63,7 +63,6 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                         let bytes = std::fs::read(path_str).expect("Failed to read replay file");
                 
                         let replay = Replay::new(bytes, path_str, content_hash, tags);
-
                         let raw_played_at = &replay
                             .parsed
                             .player_info

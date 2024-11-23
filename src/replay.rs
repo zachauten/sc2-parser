@@ -2,14 +2,14 @@ use crate::decoders::{DecoderResult, EventEntry};
 use crate::mpq::MPQArchive;
 use crate::protocol::Protocol;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use std::fs::File;
 use std::io::{BufReader, Cursor, Read, Seek};
-use std::path::PathBuf;
 use std::time::Instant;
 
-#[derive(Debug)]
+use wasm_bindgen::prelude::*;
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Event {
     pub entries: Vec<(String, DecoderResult)>,
 }
@@ -41,7 +41,7 @@ pub struct Metadata<'a> {
     pub Players: Vec<PlayerMetadata<'a>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Parsed {
     pub player_info: Vec<EventEntry>,
     pub tracker_events: Vec<Event>,
@@ -49,14 +49,25 @@ pub struct Parsed {
     pub tags: String,
 }
 
+// #[wasm_bindgen(getter_with_clone)]
+#[derive(Serialize, Deserialize)]
 pub struct Replay {
-    pub file_path: String,
-    pub content_hash: String,
-    pub parsed: Parsed,
+  pub file_path: String,
+  pub content_hash: String,
+  pub parsed: Parsed,
 }
 
-impl<'a> Replay {
-    pub fn new(bytes: Vec<u8>, path: &str, content_hash: String, tags: Vec<&'a str>) -> Replay {
+#[wasm_bindgen]
+impl Replay {
+  #[wasm_bindgen(constructor)]
+  pub fn constructor(bytes: Vec<u8>, path: &str, content_hash: String, tags: Vec<String>) -> JsValue {
+    let replay = Self::new(bytes, path, content_hash, tags);
+    serde_wasm_bindgen::to_value(&replay).unwrap()
+  }
+}
+
+impl Replay {
+    pub fn new(bytes: Vec<u8>, path: &str, content_hash: String, tags: Vec<String>) -> Replay {
         let cursor = Cursor::new(bytes);
         let reader = BufReader::new(cursor);
         let archive = MPQArchive::new(reader);
@@ -72,7 +83,7 @@ impl<'a> Replay {
     fn parse<T: Seek + Read>(
         mut archive: MPQArchive<T>,
         protocol: Protocol,
-        tags: Vec<&'a str>,
+        tags: Vec<String>,
     ) -> Parsed {
         let now = Instant::now();
 

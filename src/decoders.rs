@@ -1,3 +1,6 @@
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::protocol::Int;
 use crate::protocol::ProtocolTypeInfo;
 use crate::protocol::Struct;
@@ -138,7 +141,7 @@ pub enum StatsField {
     VespeneUsedInProgressArmy,
     VespeneUsedCurrentArmy,
 }
-
+#[derive(Serialize, Deserialize)]
 pub enum EventType {
     ObjectEvent,
     PlayerStatsEvent,
@@ -146,7 +149,7 @@ pub enum EventType {
 
 pub type EventEntry = (String, DecoderResult);
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum DecoderResult {
     Name(String),
     Value(i64),
