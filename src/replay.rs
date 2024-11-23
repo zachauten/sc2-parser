@@ -4,6 +4,8 @@ use crate::protocol::Protocol;
 
 use serde::Deserialize;
 
+use std::fs::File;
+use std::io::{BufReader, Read, Seek};
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -60,7 +62,11 @@ impl<'a> Replay {
     let path_str = file_path.to_str().unwrap();
     println!("parsing replay {:?}", path_str);
 
-    let archive = MPQArchive::new(path_str);
+    let file: File = File::open(path_str).expect("Failed to read replay file");
+    let reader: BufReader<File> = BufReader::new(file);
+
+
+    let archive = MPQArchive::<File>::new(reader);
     let protocol: Protocol = Protocol::new();
     let parsed = Replay::parse(archive, protocol, tags);
 
@@ -71,7 +77,7 @@ impl<'a> Replay {
     }
   }
 
-  fn parse (mut archive: MPQArchive, protocol: Protocol, tags: Vec<&'a str>) -> Parsed {
+  fn parse<T: Seek + Read>(mut archive: MPQArchive<T>, protocol: Protocol, tags: Vec<&'a str>) -> Parsed {
     let now = Instant::now();
 
     // let header_content = &self.archive

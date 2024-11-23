@@ -22,5 +22,5 @@ lto = "fat"
 codegen-units = 1
 opt-level = 3
 
-[lib]
-crate-type = ["cdylib"]
+#[lib]
+#crate-type = ["cdylib"]
