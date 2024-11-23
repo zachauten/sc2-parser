@@ -72,6 +72,8 @@ impl Replay {
 }
 
 impl Replay {
+    // TODO: generate content hash, it shouldn't need to be passed in.
+    // TODO: remove tags, that can be handled outside of replay parsing
     pub fn new(bytes: Vec<u8>, path: &str, content_hash: String, tags: Vec<String>) -> Replay {
         let cursor = Cursor::new(bytes);
         let reader = BufReader::new(cursor);
