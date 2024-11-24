@@ -126,8 +126,8 @@ impl<'a> ReplayParser<'a> {
     ) -> Result<ReplaySummary, &'static str> {
         let replay = raw_replay.parsed;
 
-        let parsed_metadata: Metadata = serde_json::from_str(&replay.metadata).unwrap();
-
+        // let parsed_metadata: Metadata = serde_json::from_str(&replay.metadata).unwrap();
+        let parsed_metadata = replay.metadata;
         let winner = match parsed_metadata
             .Players
             .iter()

@@ -9,7 +9,6 @@ mod protocol;
 mod replay;
 mod utils;
 
-
 use serde::Serialize;
 
 use wasm_bindgen::prelude::*;
@@ -71,6 +70,8 @@ pub struct TinybirdTimelineEntry {
     played_at: u128,
     game_version: String,
 }
+
+pub use crate::replay::Replay;
 
 #[wasm_bindgen]
 pub fn test() -> String {

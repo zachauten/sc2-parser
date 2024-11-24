@@ -6,6 +6,8 @@ use crate::protocol::ProtocolTypeInfo;
 use crate::protocol::Struct;
 
 use std::str;
+use tsify_next::Tsify;
+use wasm_bindgen::prelude::*;
 
 pub struct BitPackedBuffer {
     data: Vec<u8>,
@@ -149,7 +151,8 @@ pub enum EventType {
 
 pub type EventEntry = (String, DecoderResult);
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Tsify)]
+#[tsify(into_wasm_abi, from_wasm_abi)]
 pub enum DecoderResult {
     Name(String),
     Value(i128),

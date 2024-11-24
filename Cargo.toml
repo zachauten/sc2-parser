@@ -16,6 +16,7 @@ bzip2-rs = { git = "https://github.com/paolobarbolini/bzip2-rs", features = ["ru
 serde-wasm-bindgen = "0.6.5"
 wasm-bindgen = "0.2.95"
 console_error_panic_hook = "0.1.7"
+tsify-next = { version = "0.5.4", features = ["js"] }
 
 [profile.release]
 debug = true
