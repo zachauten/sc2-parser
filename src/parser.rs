@@ -4,7 +4,7 @@ use crate::decoders::DecoderResult;
 use crate::events::object_event::ObjectEvent;
 use crate::events::player_stats_event::PlayerStatsEvent;
 use crate::game::Game;
-use crate::replay::{Event, Metadata, Replay};
+use crate::replay::{Event, Replay};
 use crate::{Player, TinybirdGame, TinybirdTimelineEntry};
 use std::collections::HashMap;
 

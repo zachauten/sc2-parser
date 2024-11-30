@@ -6,7 +6,6 @@ use crate::protocol::ProtocolTypeInfo;
 use crate::protocol::Struct;
 
 use std::str;
-use wasm_bindgen::prelude::*;
 
 pub struct BitPackedBuffer {
     data: Vec<u8>,
