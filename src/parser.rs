@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::decoders::DecoderResult;
+use crate::decoders::{EventEntry, DecoderResult};
 use crate::events::object_event::ObjectEvent;
 use crate::events::player_stats_event::PlayerStatsEvent;
 use crate::game::Game;
@@ -141,7 +141,7 @@ impl<'a> ReplayParser<'a> {
         let raw_map = &replay
             .player_info
             .iter()
-            .find(|(field, _)| *field == "m_title")
+            .find(|EventEntry(field, _)| *field == "m_title")
             .unwrap()
             .1;
         let mut map = "";
@@ -161,7 +161,7 @@ impl<'a> ReplayParser<'a> {
         let raw_played_at = &replay
             .player_info
             .iter()
-            .find(|(field, _)| *field == "m_timeUTC")
+            .find(|EventEntry(field, _)| *field == "m_timeUTC")
             .unwrap()
             .1;
         let mut played_at = 0;
@@ -173,10 +173,10 @@ impl<'a> ReplayParser<'a> {
         // https://en.wikipedia.org/wiki/Epoch_(computing)
         played_at = (played_at / 10000000) - 11644473600;
 
-        let (_, player_list) = &replay
+        let EventEntry(_, player_list) = &replay
             .player_info
             .iter()
-            .find(|(field, _)| *field == "m_playerList")
+            .find(|EventEntry(field, _)| *field == "m_playerList")
             .unwrap();
 
         let mut players = vec![];
@@ -194,7 +194,7 @@ impl<'a> ReplayParser<'a> {
                         DecoderResult::Struct(player_values) => {
                             let raw_race = &player_values
                                 .iter()
-                                .find(|(field, _)| *field == "m_race")
+                                .find(|EventEntry(field, _)| *field == "m_race")
                                 .unwrap()
                                 .1;
                             let mut race = String::new();
@@ -208,7 +208,7 @@ impl<'a> ReplayParser<'a> {
 
                             let raw_name = &player_values
                                 .iter()
-                                .find(|(field, _)| *field == "m_name")
+                                .find(|EventEntry(field, _)| *field == "m_name")
                                 .unwrap()
                                 .1;
                             let mut name = String::new();

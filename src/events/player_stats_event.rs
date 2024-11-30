@@ -1,4 +1,4 @@
-use crate::decoders::DecoderResult;
+use crate::decoders::{EventEntry, DecoderResult};
 use crate::game::Game;
 use crate::parser::TimelineContext;
 use crate::replay::Event;
@@ -17,7 +17,7 @@ impl PlayerStatsEvent {
         let mut gameloop: u16 = 0;
         let timeline_entry: TinybirdTimelineEntry = Default::default();
 
-        for (field, value) in &event.entries {
+        for EventEntry(field, value) in &event.entries {
             match field.as_str() {
                 "_gameloop" => {
                     gameloop = if let DecoderResult::Value(v) = value {
@@ -57,7 +57,7 @@ impl PlayerStatsEvent {
                             return Err("More than 1 player in replay");
                         }
 
-                        for (key, value) in entries {
+                        for EventEntry(key, value) in entries {
                             match key.as_str() {
                                 "m_scoreValueWorkersActiveCount" => {
                                     if let DecoderResult::Value(workers) = value {

@@ -141,13 +141,15 @@ pub enum StatsField {
     VespeneUsedInProgressArmy,
     VespeneUsedCurrentArmy,
 }
+
 #[derive(Serialize, Deserialize)]
 pub enum EventType {
     ObjectEvent,
     PlayerStatsEvent,
 }
 
-pub type EventEntry = (String, DecoderResult);
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct EventEntry(pub String, pub DecoderResult);
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum DecoderResult {
@@ -342,7 +344,7 @@ impl Decoder for BitPackedDecoder<'_> {
             // field always seems to exist?
             let field_value = self.instance(self.typeinfos, &field.1, event_allowed);
             match event_allowed {
-                true => result.push((field.0.to_string(), field_value)),
+                true => result.push(EventEntry(field.0.to_string(), field_value)),
                 false => continue,
             }
         }
@@ -541,7 +543,7 @@ impl Decoder for VersionedDecoder<'_> {
             let field = fields.iter().find(|f| f.2 as i128 == tag).unwrap();
             let field_value = self.instance(self.typeinfos, &field.1, event_allowed);
             match event_allowed {
-                true => result.push((field.0.to_string(), field_value)),
+                true => result.push(EventEntry(field.0.to_string(), field_value)),
                 false => continue,
             }
         }

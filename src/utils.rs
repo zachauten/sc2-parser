@@ -1,4 +1,4 @@
-use crate::decoders::DecoderResult;
+use crate::decoders::{EventEntry, DecoderResult};
 use crate::replay::Replay;
 
 use std::fs::read_dir;
@@ -29,7 +29,7 @@ pub fn visit_dirs(replays: &mut Vec<Replay>, dir: &Path) -> Result<()> {
                             .parsed
                             .player_info
                             .iter()
-                            .find(|(field, _)| *field == "m_timeUTC")
+                            .find(|EventEntry(field, _)| *field == "m_timeUTC")
                             .unwrap()
                             .1;
                         let mut played_at = 0;

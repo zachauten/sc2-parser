@@ -10,12 +10,12 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
-    pub entries: Vec<(String, DecoderResult)>,
+    pub entries: Vec<EventEntry>,
 }
 
 impl Event {
-    pub fn new(entries: Vec<(String, DecoderResult)>) -> Event {
-        Event { entries }
+    pub fn new(entries: Vec<EventEntry>) -> Self {
+        Self { entries }
     }
 }
 

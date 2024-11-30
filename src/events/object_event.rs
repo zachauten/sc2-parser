@@ -1,4 +1,4 @@
-use crate::decoders::DecoderResult;
+use crate::decoders::{EventEntry, DecoderResult};
 use crate::game::{Game, GameObject};
 use crate::parser::TimelineContext;
 use crate::replay::Event;
@@ -166,7 +166,7 @@ impl ObjectEvent {
         let mut tag_recycle = 0;
         let mut current_gameloop = 0;
 
-        for (field, value) in &event.entries {
+        for EventEntry(field, value) in &event.entries {
             match field.as_str() {
                 "m_controlPlayerId" => {
                     player_id = if let DecoderResult::Value(v) = value {

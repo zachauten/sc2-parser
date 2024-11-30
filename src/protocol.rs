@@ -627,8 +627,8 @@ impl<'a> Protocol<'a> {
             if is_event_allowed {
                 let event = match decoded_event {
                     DecoderResult::Struct(mut entries) => {
-                        entries.push(("_gameloop".to_string(), DecoderResult::Value(gameloop)));
-                        entries.push((
+                        entries.push(EventEntry("_gameloop".to_string(), DecoderResult::Value(gameloop)));
+                        entries.push(EventEntry(
                             "_event".to_string(),
                             DecoderResult::Name(typename.to_string()),
                         ));
@@ -669,7 +669,7 @@ impl<'a> Protocol<'a> {
 
             let event = match decoder.instance(&self.typeinfos, type_id, true) {
                 DecoderResult::Struct(mut entries) => {
-                    entries.push((
+                    entries.push(EventEntry(
                         "_event".to_string(),
                         DecoderResult::Name(typename.to_string()),
                     ));
