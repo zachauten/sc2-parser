@@ -1,5 +1,5 @@
 import { assert, assertEquals } from "@std/assert";
-import init, { Replay, PlayerMetadata, Metadata } from "./pkg/sc2_parser.js";
+import init, { test, Replay, PlayerMetadata, Metadata } from "./pkg/sc2_parser.js";
 
 await init();
 

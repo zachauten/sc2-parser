@@ -8,6 +8,7 @@ use sha256::digest_bytes;
 use std::io::{BufReader, Cursor, Read, Seek};
 use wasm_bindgen::prelude::*;
 
+#[wasm_bindgen(getter_with_clone)]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
     pub entries: Vec<EventEntry>,
@@ -22,31 +23,41 @@ impl Event {
 #[wasm_bindgen(getter_with_clone)]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerMetadata {
-    pub PlayerID: u8,
-    pub APM: f32,
-    pub Result: String,
-    pub SelectedRace: String,
-    pub AssignedRace: String,
+    #[serde(rename(deserialize = "PlayerID"))]
+    pub player_id: u8,
+    #[serde(rename(deserialize = "APM"))]
+    pub apm: f32,
+    #[serde(rename(deserialize = "Result"))]
+    pub result: String,
+    #[serde(rename(deserialize = "SelectedRace"))]
+    pub selected_race: String,
+    #[serde(rename(deserialize = "AssignedRace"))]
+    pub assigned_race: String,
 }
 
 #[wasm_bindgen(getter_with_clone)]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
-    pub Title: String,
-    pub GameVersion: String,
-    pub DataBuild: String,
-    pub DataVersion: String,
-    pub BaseBuild: String,
-    pub Duration: u16,
-    pub Players: Vec<PlayerMetadata>,
+    #[serde(rename(deserialize = "Title"))]
+    pub title: String,
+    #[serde(rename(deserialize = "GameVersion"))]
+    pub game_version: String,
+    #[serde(rename(deserialize = "DataBuild"))]
+    pub data_build: String,
+    #[serde(rename(deserialize = "DataVersion"))]
+    pub data_version: String,
+    #[serde(rename(deserialize = "BaseBuild"))]
+    pub base_build: String,
+    #[serde(rename(deserialize = "Duration"))]
+    pub duration: u16,
+    #[serde(rename(deserialize = "Players"))]
+    pub players: Vec<PlayerMetadata>,
 }
 
 #[wasm_bindgen(getter_with_clone)]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Parsed {
-    #[wasm_bindgen(skip)]
     pub player_info: Vec<EventEntry>,
-    #[wasm_bindgen(skip)]
     pub tracker_events: Vec<Event>,
     pub metadata: Metadata,
 }
@@ -59,7 +70,7 @@ pub struct Replay {
     pub parsed: Parsed,
 }
 
-#[wasm_bindgen(getter_with_clone)]
+#[wasm_bindgen]
 impl Replay {
     #[wasm_bindgen(constructor)]
     pub fn new(bytes: Vec<u8>, path: &str) -> Self {

@@ -5,6 +5,9 @@ use crate::protocol::Int;
 use crate::protocol::ProtocolTypeInfo;
 use crate::protocol::Struct;
 
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::convert::*;
+
 use std::str;
 
 pub struct BitPackedBuffer {
@@ -148,10 +151,12 @@ pub enum EventType {
     PlayerStatsEvent,
 }
 
+#[wasm_bindgen(getter_with_clone)]
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EventEntry(pub String, pub DecoderResult);
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(tag = "type", content = "data")]
 pub enum DecoderResult {
     Name(String),
     Value(i128),
@@ -164,6 +169,34 @@ pub enum DecoderResult {
     Struct(Vec<EventEntry>),
     Null,
     Empty,
+}
+
+impl From<DecoderResult> for JsValue {
+    fn from(val: DecoderResult) -> Self {
+        serde_wasm_bindgen::to_value(&val).unwrap()
+    }
+}
+
+impl wasm_bindgen::describe::WasmDescribe for DecoderResult {
+    fn describe() {
+        JsValue::describe()
+    }
+}
+
+impl wasm_bindgen::convert::IntoWasmAbi for DecoderResult {
+    type Abi = <JsValue as IntoWasmAbi>::Abi;
+
+    fn into_abi(self) -> Self::Abi {
+        serde_wasm_bindgen::to_value(&self).unwrap().into_abi()
+    }
+}
+
+impl wasm_bindgen::convert::FromWasmAbi for DecoderResult {
+    type Abi = <JsValue as FromWasmAbi>::Abi;
+
+    unsafe fn from_abi(js: Self::Abi) -> Self {
+        serde_wasm_bindgen::from_value(JsValue::from_abi(js)).unwrap()
+    }
 }
 
 pub trait Decoder {

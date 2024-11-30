@@ -129,14 +129,14 @@ impl<'a> ReplayParser<'a> {
         // let parsed_metadata: Metadata = serde_json::from_str(&replay.metadata).unwrap();
         let parsed_metadata = replay.metadata;
         let winner = match parsed_metadata
-            .Players
+            .players
             .iter()
-            .find(|player| player.Result == "Win")
+            .find(|player| player.result == "Win")
         {
-            Some(player) => player.PlayerID,
+            Some(player) => player.player_id,
             None => return Err("couldn't find winner"),
         };
-        let game_length = parsed_metadata.Duration;
+        let game_length = parsed_metadata.duration;
 
         let raw_map = &replay
             .player_info
@@ -255,7 +255,7 @@ impl<'a> ReplayParser<'a> {
             map: map.to_owned(),
             game_length,
             played_at,
-            game_version: parsed_metadata.GameVersion.to_string(),
+            game_version: parsed_metadata.game_version.to_string(),
         };
 
         // event parser owns events now
