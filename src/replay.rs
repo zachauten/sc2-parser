@@ -6,11 +6,9 @@ use serde::{Deserialize, Serialize};
 use sha256::digest_bytes;
 
 use std::io::{BufReader, Cursor, Read, Seek};
-use tsify_next::Tsify;
 use wasm_bindgen::prelude::*;
 
-// #[wasm_bindgen]
-#[derive(Debug, Serialize, Deserialize, Tsify)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
     pub entries: Vec<(String, DecoderResult)>,
 }
@@ -21,8 +19,8 @@ impl Event {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[wasm_bindgen(getter_with_clone)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerMetadata {
     pub PlayerID: u8,
     pub APM: f32,
@@ -31,7 +29,8 @@ pub struct PlayerMetadata {
     pub AssignedRace: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[wasm_bindgen(getter_with_clone)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
     pub Title: String,
     pub GameVersion: String,
@@ -39,44 +38,38 @@ pub struct Metadata {
     pub DataVersion: String,
     pub BaseBuild: String,
     pub Duration: u16,
-    // pub IsNotAvailable: bool,
     pub Players: Vec<PlayerMetadata>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[wasm_bindgen(getter_with_clone)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Parsed {
+    #[wasm_bindgen(skip)]
     pub player_info: Vec<EventEntry>,
+    #[wasm_bindgen(skip)]
     pub tracker_events: Vec<Event>,
     pub metadata: Metadata,
 }
 
-// #[wasm_bindgen(getter_with_clone)]
-#[derive(Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[wasm_bindgen(getter_with_clone)]
+#[derive(Serialize, Deserialize)]
 pub struct Replay {
     pub file_path: String,
     pub content_hash: String,
     pub parsed: Parsed,
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(getter_with_clone)]
 impl Replay {
     #[wasm_bindgen(constructor)]
-    pub fn constructor(bytes: Vec<u8>, path: &str) -> Self {
-        Self::new(bytes, path)
-    }
-}
-
-impl Replay {
-    pub fn new(bytes: Vec<u8>, path: &str) -> Replay {
+    pub fn new(bytes: Vec<u8>, path: &str) -> Self {
         let content_hash = digest_bytes(&bytes);
         let cursor = Cursor::new(bytes);
         let reader = BufReader::new(cursor);
         let archive = MPQArchive::new(reader);
         let protocol: Protocol = Protocol::new();
-        let parsed = Replay::parse(archive, protocol);
-        Replay {
+        let parsed = Self::parse(archive, protocol);
+        Self {
             file_path: path.to_string(),
             content_hash,
             parsed,
